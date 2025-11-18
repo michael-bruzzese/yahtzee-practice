@@ -20,7 +20,7 @@ Then open http://localhost:3000.
 - `npm run build` / `npm start` – production build/serve
 
 ## Project Log (for Michael/Navarre)
-- 2024-xx-xx: Scaffolded Next.js + TS + Tailwind app; git initialized (main).
+- 2024-xx-xx: Scaffolded Next.js + TS + Tailwind app; git initialized (main); linked to GitHub `yahtzee-practice`.
 
 ## Near-Term Plan
 - Build a Yahtzee rules/score engine with tests.
@@ -30,5 +30,5 @@ Then open http://localhost:3000.
 - Gate staging site behind a simple password during development.
 
 ## GitHub / Deployment
-- Repo not yet connected to GitHub; add a remote and push when ready (e.g., `git remote add origin git@github.com:<your-account>/yahtzee.git && git push -u origin main`).
+- Remote: `git@github.com:michael-bruzzese/yahtzee-practice.git` (main).
 - Deployment target: Vercel (free, vercel.app URL). Password gate will live in Next.js middleware using an env var.
