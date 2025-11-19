@@ -1001,11 +1001,29 @@ function PlayerSetupModal({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -20 }}
-        className="w-full max-w-2xl rounded-3xl border border-white/10 bg-white/95 p-6 text-slate-900 shadow-2xl"
+        className="flex max-h-[90vh] w-full max-w-2xl flex-col rounded-3xl border border-white/10 bg-white/95 p-6 text-slate-900 shadow-2xl"
       >
         <h2 className="text-2xl font-semibold text-slate-900">Set up your players</h2>
-        <p className="text-sm text-slate-500">Pick a character and name for each player.</p>
-        <div className="mt-6 flex flex-col gap-8">
+        <p className="text-sm text-slate-500">
+          Pick a character and name, then hit <span className="font-semibold text-slate-700">Save &amp; start</span> or skip to use the current players.
+        </p>
+        <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
+          <button
+            type="button"
+            onClick={onCancel}
+            className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 hover:border-slate-300 hover:text-slate-800"
+          >
+            Skip for now
+          </button>
+          <button
+            type="button"
+            onClick={onSave}
+            className="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-indigo-500"
+          >
+            Save &amp; start
+          </button>
+        </div>
+        <div className="mt-6 flex-1 space-y-8 overflow-y-auto pr-1">
           {profiles.map((profile, idx) => (
             <div key={idx} className="rounded-2xl border border-slate-200/80 p-4 shadow-sm">
               <label className="text-sm font-semibold text-slate-700">
@@ -1043,21 +1061,26 @@ function PlayerSetupModal({
             </div>
           ))}
         </div>
-        <div className="mt-6 flex justify-end gap-3">
-          <button
-            type="button"
-            onClick={onCancel}
-            className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 hover:border-slate-300 hover:text-slate-800"
-          >
-            Cancel
-          </button>
-          <button
-            type="button"
-            onClick={onSave}
-            className="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-indigo-500"
-          >
-            Save & start
-          </button>
+        <div className="mt-6 flex flex-col gap-3 border-t border-slate-200/70 pt-4 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-xs text-slate-500">
+            Save to begin with these avatars, or skip to keep the current lineup.
+          </p>
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={onCancel}
+              className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 hover:border-slate-300 hover:text-slate-800"
+            >
+              Skip for now
+            </button>
+            <button
+              type="button"
+              onClick={onSave}
+              className="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-indigo-500"
+            >
+              Save &amp; start
+            </button>
+          </div>
         </div>
       </motion.div>
     </div>
