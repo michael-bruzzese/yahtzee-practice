@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Category,
@@ -12,6 +12,7 @@ import {
   upperCategories,
 } from "@/lib/yahtzee/rules";
 import { GameState, createGame, rollDice, selectCategory, toggleHold } from "@/lib/yahtzee/game";
+import { ScoreEntry } from "@/lib/leaderboard";
 
 type UIMessage = { type: "error" | "info"; text: string };
 
@@ -37,6 +38,13 @@ export default function Home() {
   const [game, setGame] = useState<GameState>(() => createGame(defaultPlayers));
   const [rollKey, setRollKey] = useState(0);
   const [message, setMessage] = useState<UIMessage | null>(null);
+  const [leaderboard, setLeaderboard] = useState<ScoreEntry[]>([]);
+  const [leaderLoading, setLeaderLoading] = useState(true);
+  const [leaderError, setLeaderError] = useState<string | null>(null);
+  const [submitted, setSubmitted] = useState(false);
+  const [soundEnabled, setSoundEnabled] = useState(true);
+  const playRollSound = useChime(soundEnabled, { type: "roll" });
+  const playSelectSound = useChime(soundEnabled, { type: "select" });
 
   const currentPlayer = game.players[game.currentPlayerIndex];
   const totals = useMemo(
@@ -44,11 +52,32 @@ export default function Home() {
     [game.players]
   );
 
+  useEffect(() => {
+    loadScores();
+  }, []);
+
+  const loadScores = async () => {
+    setLeaderLoading(true);
+    setLeaderError(null);
+    try {
+      const res = await fetch("/api/scores", { cache: "no-store" });
+      if (!res.ok) throw new Error("Failed to load leaderboard");
+      const data = await res.json();
+      setLeaderboard(data.scores ?? []);
+    } catch (err) {
+      setLeaderError((err as Error).message);
+    } finally {
+      setLeaderLoading(false);
+    }
+  };
+
   const handleRoll = () => {
     setMessage(null);
     try {
       setGame((prev) => rollDice(prev));
       setRollKey((k) => k + 1);
+      playRollSound();
+      setSubmitted(false);
     } catch (err) {
       setMessage({ type: "error", text: (err as Error).message });
     }
@@ -67,6 +96,7 @@ export default function Home() {
     setMessage(null);
     try {
       setGame((prev) => selectCategory(prev, category));
+      playSelectSound();
     } catch (err) {
       setMessage({ type: "error", text: (err as Error).message });
     }
@@ -76,6 +106,7 @@ export default function Home() {
     setMessage({ type: "info", text: "New game started" });
     setRollKey((k) => k + 1);
     setGame(createGame(defaultPlayers));
+    setSubmitted(false);
   };
 
   const potentialScore = (category: Category) =>
@@ -85,10 +116,38 @@ export default function Home() {
   const winner =
     gameComplete && [...totals].sort((a, b) => b.total - a.total)[0]?.name;
 
+  const handleSubmitScores = async () => {
+    if (!gameComplete) {
+      setMessage({ type: "error", text: "Finish the game before submitting scores." });
+      return;
+    }
+    if (submitted) {
+      setMessage({ type: "info", text: "Scores already submitted for this round." });
+      return;
+    }
+
+    try {
+      const res = await fetch("/api/scores", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          players: totals.map((t) => ({ name: t.name, score: t.total })),
+        }),
+      });
+      if (!res.ok) throw new Error("Could not save scores");
+      const data = await res.json();
+      setLeaderboard(data.scores ?? []);
+      setSubmitted(true);
+      setMessage({ type: "info", text: "Scores submitted to leaderboard." });
+    } catch (err) {
+      setMessage({ type: "error", text: (err as Error).message });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0b1028] via-[#101f3f] to-[#311c45] text-slate-100">
       <div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-10 sm:py-14">
-        <Header onNewGame={handleNewGame} />
+        <Header onNewGame={handleNewGame} soundEnabled={soundEnabled} onToggleSound={() => setSoundEnabled((v) => !v)} />
 
         <div className="grid gap-4 lg:grid-cols-[1.2fr,0.8fr]">
           <section className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm shadow-lg shadow-indigo-900/20">
@@ -108,6 +167,10 @@ export default function Home() {
                 rollKey={rollKey}
               />
 
+              <div className="rounded-xl border border-indigo-300/10 bg-indigo-50/5 px-4 py-3 text-xs text-indigo-100/80">
+                Roll up to 3 times per turn. Tap dice to hold, then select a category to score. Game ends when all categories are filled.
+              </div>
+
               <Controls
                 onRoll={handleRoll}
                 onNewGame={handleNewGame}
@@ -115,6 +178,32 @@ export default function Home() {
                 diceRolled={Boolean(game.dice)}
                 gameComplete={gameComplete}
               />
+
+              {gameComplete && (
+                <div className="flex flex-col gap-2 rounded-xl border border-emerald-300/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-50 shadow-[0_10px_40px_-20px_rgba(16,185,129,0.4)]">
+                  <div className="flex items-center justify-between">
+                    <span className="font-semibold">Game complete!</span>
+                    {winner ? <span className="text-xs uppercase tracking-[0.15em] text-emerald-100/80">Winner: {winner}</span> : null}
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <button
+                      onClick={handleSubmitScores}
+                      type="button"
+                      className="rounded-lg bg-emerald-400/80 px-3 py-2 text-xs font-semibold text-emerald-950 shadow hover:bg-emerald-300"
+                      disabled={submitted}
+                    >
+                      {submitted ? "Submitted" : "Submit scores to leaderboard"}
+                    </button>
+                    <button
+                      onClick={handleNewGame}
+                      type="button"
+                      className="rounded-lg border border-white/20 px-3 py-2 text-xs font-semibold text-white hover:border-white/40"
+                    >
+                      Start new game
+                    </button>
+                  </div>
+                </div>
+              )}
 
               <AnimatePresence>
                 {message && (
@@ -145,6 +234,12 @@ export default function Home() {
               potentialScore={potentialScore}
             />
             <PlayerTotals totals={totals} currentIndex={game.currentPlayerIndex} />
+            <Leaderboard
+              scores={leaderboard}
+              loading={leaderLoading}
+              error={leaderError}
+              onRefresh={loadScores}
+            />
           </section>
         </div>
       </div>
@@ -152,7 +247,15 @@ export default function Home() {
   );
 }
 
-function Header({ onNewGame }: { onNewGame: () => void }) {
+function Header({
+  onNewGame,
+  soundEnabled,
+  onToggleSound,
+}: {
+  onNewGame: () => void;
+  soundEnabled: boolean;
+  onToggleSound: () => void;
+}) {
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <div>
@@ -169,7 +272,23 @@ function Header({ onNewGame }: { onNewGame: () => void }) {
       >
         New game
       </button>
+      <SoundToggle enabled={soundEnabled} onToggle={onToggleSound} />
     </div>
+  );
+}
+
+function SoundToggle({ enabled, onToggle }: { enabled: boolean; onToggle: () => void }) {
+  return (
+    <button
+      onClick={onToggle}
+      type="button"
+      className="inline-flex items-center gap-2 self-start rounded-full border border-white/20 bg-white/5 px-3 py-2 text-xs font-semibold text-white transition hover:border-white/40 hover:bg-white/10"
+    >
+      <span
+        className={`h-2 w-2 rounded-full ${enabled ? "bg-emerald-400 shadow-[0_0_0_4px_rgba(52,211,153,0.2)]" : "bg-rose-300"}`}
+      />
+      Sound {enabled ? "on" : "off"}
+    </button>
   );
 }
 
@@ -399,6 +518,58 @@ function ScoreCard({
   );
 }
 
+function Leaderboard({
+  scores,
+  loading,
+  error,
+  onRefresh,
+}: {
+  scores: ScoreEntry[];
+  loading: boolean;
+  error: string | null;
+  onRefresh: () => void;
+}) {
+  return (
+    <div className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm shadow-lg shadow-indigo-900/20">
+      <div className="mb-3 flex items-center justify-between">
+        <div>
+          <p className="text-xs text-indigo-100/80">Leaderboard</p>
+          <h3 className="text-lg font-semibold text-white">Top scores</h3>
+        </div>
+        <button
+          onClick={onRefresh}
+          type="button"
+          className="text-xs font-semibold text-indigo-100 underline decoration-dotted underline-offset-4 hover:text-white"
+        >
+          Refresh
+        </button>
+      </div>
+      {loading ? (
+        <p className="text-sm text-slate-200/80">Loading…</p>
+      ) : error ? (
+        <p className="text-sm text-rose-200">{error}</p>
+      ) : scores.length === 0 ? (
+        <p className="text-sm text-slate-200/80">No scores yet. Finish a game and submit!</p>
+      ) : (
+        <div className="flex flex-col gap-2">
+          {scores.map((entry, idx) => (
+            <div
+              key={entry.id ?? `${entry.name}-${idx}`}
+              className="flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-100"
+            >
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-indigo-100/80">#{idx + 1}</span>
+                <span className="font-semibold">{entry.name}</span>
+              </div>
+              <span className="text-base font-semibold text-white">{entry.score}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function PlayerTotals({
   totals,
   currentIndex,
@@ -432,4 +603,30 @@ function PlayerTotals({
       </div>
     </div>
   );
+}
+
+function useChime(enabled: boolean, { type }: { type: "roll" | "select" }) {
+  const ctxRef = useRef<AudioContext | null>(null);
+
+  return () => {
+    if (!enabled || typeof window === "undefined") return;
+    try {
+      if (!ctxRef.current) {
+        ctxRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+      }
+      const ctx = ctxRef.current;
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(type === "roll" ? 420 : 660, now);
+      gain.gain.setValueAtTime(0.15, now);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.25);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.3);
+    } catch {
+      /* ignore sound errors */
+    }
+  };
 }

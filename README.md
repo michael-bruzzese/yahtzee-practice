@@ -23,15 +23,22 @@ Then open http://localhost:3000.
 ## Project Log (for Michael/Navarre)
 - 2024-xx-xx: Scaffolded Next.js + TS + Tailwind app; git initialized (main); linked to GitHub `yahtzee-practice`.
 - 2024-xx-xx: Added Yahtzee rules/score engine with pure functions and tests (Vitest); basic game state transitions (roll/hold/select).
-- 2024-xx-xx: Replaced starter page with interactive UI (dice tray with holds, roll controls, scorecard selection, player totals); added Framer Motion for animations.
+- 2024-xx-xx: Replaced starter page with interactive UI (dice tray with holds, roll controls, scorecard selection, player totals), added Framer Motion + sound toggle; added leaderboard endpoints and password gate.
 
 ## Near-Term Plan
-- Build a Yahtzee rules/score engine with tests.
-- Create UI for rolling/holding dice, selecting score categories, and passing the turn.
-- Add a simple leaderboard + API routes (likely Vercel Postgres).
-- Apply playful/anime-inspired theme with smooth Framer Motion animations; add sound toggle.
-- Gate staging site behind a simple password during development.
+- Hook leaderboard UI to real persistence (Vercel Postgres) via env vars.
+- Add basic onboarding tooltip and richer animations/sounds as desired.
+- Deploy to Vercel with password gate turned on (`APP_PASSWORD`).
 
 ## GitHub / Deployment
 - Remote: `git@github.com:michael-bruzzese/yahtzee-practice.git` (main).
 - Deployment target: Vercel (free, vercel.app URL). Password gate will live in Next.js middleware using an env var.
+
+## Password Gate (staging)
+- Set `APP_PASSWORD` in env (e.g., Vercel env vars or `.env.local`) to require Basic Auth. Without it, the site is open.
+- When set, the browser will prompt for a password (username is `user`, password is `APP_PASSWORD`).
+
+## Leaderboard Persistence
+- API routes: `GET /api/scores` (top 20), `POST /api/scores` with `{ players: [{ name, score }] }`.
+- DB: configure `POSTGRES_URL` (or `DATABASE_URL`) to use Postgres (e.g., Vercel Postgres). Table auto-creates: `leaderboard (id serial, name text, score int, created_at timestamptz)`.
+- Without a DB connection string, the app falls back to in-memory scores (resets on restart).
