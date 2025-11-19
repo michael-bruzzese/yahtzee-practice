@@ -1,0 +1,13 @@
+<svg width="120" height="120" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="blur-grad" x1="0%" x2="100%" y1="0%" y2="0%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0"/>
+      <stop offset="50%" stop-color="#ffffff" stop-opacity="0.7"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect x="5" y="5" width="110" height="110" rx="18" fill="#f5f5f5" stroke="#111827" stroke-width="4" opacity="0.6"/>
+  <rect x="10" y="30" width="100" height="12" fill="url(#blur-grad)"/>
+  <rect x="10" y="54" width="100" height="12" fill="url(#blur-grad)"/>
+  <rect x="10" y="78" width="100" height="12" fill="url(#blur-grad)"/>
+</svg>

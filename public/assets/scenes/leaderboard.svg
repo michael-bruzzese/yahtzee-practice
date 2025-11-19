@@ -1,0 +1,34 @@
+<svg width="400" height="280" viewBox="0 0 400 280" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="lb-panel" x1="0%" x2="100%" y1="0%" y2="0%">
+      <stop offset="0%" stop-color="#1c1f3a"/>
+      <stop offset="100%" stop-color="#272b4f"/>
+    </linearGradient>
+    <linearGradient id="lb-glow" x1="0%" x2="0%" y1="0%" y2="100%">
+      <stop offset="0%" stop-color="#7ae0ff" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#7ae0ff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect x="10" y="10" width="380" height="260" rx="24" fill="url(#lb-panel)" stroke="#4ad9ff" stroke-width="3"/>
+  <rect x="20" y="24" width="360" height="1" fill="url(#lb-glow)"/>
+  <text x="30" y="56" fill="#9be7ff" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="600">Leaderboard</text>
+  <text x="30" y="80" fill="#4ad9ff" font-family="Arial, Helvetica, sans-serif" font-size="10" letter-spacing="4">TOP SCORES</text>
+  <g fill="#d9f4ff" font-family="Arial, Helvetica, sans-serif" font-size="14">
+    <text x="30" y="114">1.</text>
+    <text x="30" y="150">2.</text>
+    <text x="30" y="186">3.</text>
+    <text x="30" y="222">4.</text>
+  </g>
+  <g fill="#fefefe" font-family="Arial, Helvetica, sans-serif" font-size="14">
+    <text x="60" y="114">Player Name</text>
+    <text x="60" y="150">Player Name</text>
+    <text x="60" y="186">Player Name</text>
+    <text x="60" y="222">Player Name</text>
+  </g>
+  <g fill="#f7b733" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="700" text-anchor="end">
+    <text x="360" y="114">999</text>
+    <text x="360" y="150">875</text>
+    <text x="360" y="186">720</text>
+    <text x="360" y="222">650</text>
+  </g>
+</svg>
