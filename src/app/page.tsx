@@ -513,7 +513,7 @@ function Header({
       <div>
         <p className="text-sm uppercase tracking-[0.25em] text-indigo-200/80">Playful Yahtzee</p>
         <h1 className="text-3xl font-semibold text-white sm:text-4xl">Pass & Play</h1>
-        <p className="text-sm text-slate-200/80">Roll, Hold, Score. Roll some bones!</p>
+        <p className="text-sm text-slate-200/80">Roll, hold, score. Roll them bones!!!</p>
         <p className="text-xs text-slate-200/60">
           Players: {playerNames.join(" vs ")}
         </p>
