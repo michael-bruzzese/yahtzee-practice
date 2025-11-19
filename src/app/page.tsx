@@ -118,6 +118,8 @@ export default function Home() {
   const animationTimers = useRef<ReturnType<typeof setTimeout>[]>([]);
   const playRollSound = useChime(soundEnabled, { type: "roll" });
   const playSelectSound = useChime(soundEnabled, { type: "select" });
+  const playDiceSound = usePercussiveFx(soundEnabled, "dice");
+  const playYahtzeeSound = usePercussiveFx(soundEnabled, "yahtzee");
 
   const currentPlayer = game.players[game.currentPlayerIndex];
   const currentProfile = playerProfiles[game.currentPlayerIndex] ?? playerProfiles[0];
@@ -212,20 +214,20 @@ export default function Home() {
     setAwaitingNextPlayer(null);
   };
 
-  const triggerRollAnimation = () => {
-    if (typeof window === "undefined") return;
-    clearAnimationTimers();
-    setIsRollingAnimation(true);
-    setAvatarPose("windup");
-    const windup = setTimeout(() => {
-      setAvatarPose("throw");
-    }, 250);
-    const settle = setTimeout(() => {
-      setAvatarPose("idle");
-      setIsRollingAnimation(false);
-    }, 900);
-    animationTimers.current.push(windup, settle);
-  };
+const triggerRollAnimation = () => {
+  if (typeof window === "undefined") return;
+  clearAnimationTimers();
+  setIsRollingAnimation(true);
+  setAvatarPose("windup");
+  const windup = setTimeout(() => {
+    setAvatarPose("throw");
+  }, 200);
+  const settle = setTimeout(() => {
+    setAvatarPose("idle");
+    setIsRollingAnimation(false);
+  }, 750);
+  animationTimers.current.push(windup, settle);
+};
 
   const handleRoll = () => {
     if (awaitingNextPlayer) {
@@ -242,6 +244,7 @@ export default function Home() {
       setGame((prev) => rollDice(prev));
       setRollKey((k) => k + 1);
       playRollSound();
+      playDiceSound();
       setSubmitted(false);
     } catch (err) {
       setMessage({ type: "error", text: (err as Error).message });
@@ -277,21 +280,27 @@ export default function Home() {
       setMessage({ type: "info", text: "Let the dice settle before scoring." });
       return;
     }
+    const shouldCelebrateYahtzee =
+      category === "yahtzee" && game.dice && scoreCategory("yahtzee", game.dice) >= 50;
+    let nextPlayerName: string | null = null;
     setMessage(null);
     try {
       setGame((prev) => {
         const next = selectCategory(prev, category);
         if (next.phase === "complete" || next.players.length <= 1) {
-          setAwaitingNextPlayer(null);
+          nextPlayerName = null;
         } else if (next.phase === "rolling") {
-          const nextPlayer = next.players[next.currentPlayerIndex]?.name;
-          if (nextPlayer) {
-            setAwaitingNextPlayer(nextPlayer);
-          }
+          nextPlayerName = next.players[next.currentPlayerIndex]?.name ?? null;
+        } else {
+          nextPlayerName = null;
         }
         return next;
       });
+      setAwaitingNextPlayer(nextPlayerName);
       playSelectSound();
+      if (shouldCelebrateYahtzee) {
+        playYahtzeeSound();
+      }
     } catch (err) {
       setMessage({ type: "error", text: (err as Error).message });
     }
@@ -1090,3 +1099,64 @@ function useChime(enabled: boolean, { type }: { type: "roll" | "select" }) {
     }
   };
 }
+
+type PercussiveType = "dice" | "yahtzee";
+
+function usePercussiveFx(enabled: boolean, type: PercussiveType) {
+  const ctxRef = useRef<AudioContext | null>(null);
+
+  return () => {
+    if (!enabled || typeof window === "undefined") return;
+    try {
+      if (!ctxRef.current) {
+        ctxRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+      }
+      const ctx = ctxRef.current;
+      const now = ctx.currentTime;
+      if (type === "dice") {
+        playDiceClack(ctx, now);
+      } else {
+        playYahtzeeApplause(ctx, now);
+      }
+    } catch {
+      /* ignore fx errors */
+    }
+  };
+}
+
+const createNoiseBuffer = (ctx: AudioContext, duration = 0.3) => {
+  const buffer = ctx.createBuffer(1, Math.max(1, Math.floor(ctx.sampleRate * duration)), ctx.sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < data.length; i += 1) {
+    data[i] = (Math.random() * 2 - 1) * 0.6;
+  }
+  return buffer;
+};
+
+const playDiceClack = (ctx: AudioContext, start: number) => {
+  const source = ctx.createBufferSource();
+  source.buffer = createNoiseBuffer(ctx, 0.4);
+  const filter = ctx.createBiquadFilter();
+  filter.type = "bandpass";
+  filter.frequency.value = 1600;
+  filter.Q.value = 4;
+  const gain = ctx.createGain();
+  gain.gain.setValueAtTime(0.4, start);
+  gain.gain.exponentialRampToValueAtTime(0.001, start + 0.4);
+  source.connect(filter).connect(gain).connect(ctx.destination);
+  source.start(start);
+  source.stop(start + 0.4);
+};
+
+const playYahtzeeApplause = (ctx: AudioContext, start: number) => {
+  const source = ctx.createBufferSource();
+  source.buffer = createNoiseBuffer(ctx, 1.3);
+  const gain = ctx.createGain();
+  gain.gain.setValueAtTime(0.001, start);
+  gain.gain.linearRampToValueAtTime(0.6, start + 0.1);
+  gain.gain.setTargetAtTime(0.15, start + 0.6, 0.5);
+  gain.gain.exponentialRampToValueAtTime(0.001, start + 1.3);
+  source.connect(gain).connect(ctx.destination);
+  source.start(start);
+  source.stop(start + 1.3);
+};

@@ -15,7 +15,7 @@
   <path d="M70 52c22-28 96-28 118 0l18 16c6 6 4 18-4 24l-12 8H68l-12-8c-8-6-10-18-4-24z" fill="#27253f"/>
   <circle cx="105" cy="95" r="7" fill="#07090f"/>
   <circle cx="155" cy="95" r="7" fill="#07090f"/>
-  <path d="M108 120c10 16 34 16 44 0" stroke="#3c1c12" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <path d="M92 122c18 26 56 26 72 0" stroke="#3c1c12" stroke-width="6" fill="none" stroke-linecap="round"/>
   <path d="M60 150h140l28 140H32z" fill="url(#shadow-coat)" stroke="#111630" stroke-width="4" stroke-linejoin="round"/>
   <rect x="72" y="190" width="116" height="120" rx="48" fill="#3b3b60"/>
   <path d="M50 196c-12 0-26 26-20 46 6 20 24 24 38 8 14-16 4-54-18-54z" fill="#ffd4b7"/>

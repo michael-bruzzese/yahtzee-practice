@@ -15,7 +15,7 @@
   <path d="M50 82c30-44 128-44 160 0l14 22c6 8 0 24-10 24H46c-10 0-16-16-10-24z" fill="#dca7ff"/>
   <circle cx="108" cy="98" r="7" fill="#2c0f40"/>
   <circle cx="154" cy="98" r="7" fill="#2c0f40"/>
-  <path d="M110 118c14 16 38 16 48 0" stroke="#571780" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <path d="M90 120c22 34 64 34 84 0" stroke="#571780" stroke-width="6" fill="none" stroke-linecap="round"/>
   <path d="M54 156h150l26 148H30z" fill="url(#nova-w-suit)" stroke="#28124d" stroke-width="4" stroke-linejoin="round"/>
   <rect x="84" y="190" width="112" height="134" rx="52" fill="#b489ff"/>
   <path d="M46 208c-14 0-22 28-12 46s32 20 44 6 2-52-32-52z" fill="#ffd6e8"/>

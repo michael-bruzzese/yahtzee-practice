@@ -19,7 +19,7 @@
   <path d="M42 96c28-60 148-60 176 0l-20 36H62z" fill="url(#sunny-hair)"/>
   <circle cx="104" cy="100" r="7" fill="#1b130f"/>
   <circle cx="156" cy="100" r="7" fill="#1b130f"/>
-  <path d="M110 126c12 16 36 16 44 0" stroke="#b13b18" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <path d="M92 128c18 30 58 30 76 0" stroke="#b13b18" stroke-width="6" fill="none" stroke-linecap="round"/>
   <path d="M60 160h140l24 140H36z" fill="url(#sunny-dress)" stroke="#912803" stroke-width="4" stroke-linejoin="round"/>
   <rect x="78" y="190" width="104" height="120" rx="48" fill="#ffba5f"/>
   <path d="M42 210c-16 0-24 30-12 48s38 14 46-6-6-42-34-42z" fill="#ffd5ba"/>

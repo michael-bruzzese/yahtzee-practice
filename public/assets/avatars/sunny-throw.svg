@@ -15,7 +15,7 @@
   <path d="M38 90c30-58 150-58 180 0l-14 28H52z" fill="#ffc160"/>
   <circle cx="106" cy="100" r="7" fill="#1a100c"/>
   <circle cx="160" cy="100" r="7" fill="#1a100c"/>
-  <path d="M112 125c12 16 34 16 42 0" stroke="#b03618" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <path d="M94 128c20 32 56 32 72 0" stroke="#b03618" stroke-width="6" fill="none" stroke-linecap="round"/>
   <path d="M54 160h150l30 150H24z" fill="url(#sunny-t-dress)" stroke="#851b05" stroke-width="4" stroke-linejoin="round"/>
   <rect x="78" y="198" width="112" height="128" rx="52" fill="#ffb55f"/>
   <path d="M20 228c-18 0-24 24-14 40s34 18 46 4 6-44-32-44z" fill="#ffd5b1"/>

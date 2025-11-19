@@ -7,7 +7,8 @@ Keep this file updated at the end of each session so future work has context.
 - Tests: `npm test` (Vitest). Do not pass `--runInBand`; Vitest does not support that flag.
 - Leaderboard persistence: wired to Neon Postgres (`POSTGRES_URL` in `.env.local`). Verified by hitting `/api/scores` (GET and POST) while `next dev` was running; rows persisted and read back successfully.
 - UX: Added player-edit modal (restarts game with personalized names) and a pass-to-next-player overlay that locks controls until the next player acknowledges.
-- Visuals/flow: Avatars refreshed with richer art, table stays on the left, and the scoring column (scorecard + leaderboard) now lives on the right so players can log scores without scrolling.
+- Visuals/flow: Avatars refreshed with richer art (bigger smiles, sharper colors), table stays on the left, and the scoring column (scorecard + leaderboard) now lives on the right so players can log scores without scrolling.
+- Audio/UX: Dice rolls now trigger a subtle “clackity clack” effect, Yahtzees fire applause, and the auto-pass overlay returns right after scoring so turns advance smoothly.
 - Leaderboard: auto-submits at game completion—no button required—and refreshes immediately when a round ends.
 - Pending: capture polish ideas (better animation timing, richer dice physics/audio, art refinements) as they arise.
 

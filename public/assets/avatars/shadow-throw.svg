@@ -11,12 +11,12 @@
   </defs>
   <rect width="260" height="340" fill="none"/>
   <ellipse cx="128" cy="316" rx="90" ry="20" fill="#050a16" opacity="0.35"/>
-  <circle cx="128" cy="90" r "70" fill="url(#shadow-skin-t)" stroke="#0f0d12" stroke-width="5"/>
+  <circle cx="128" cy="90" r="70" fill="url(#shadow-skin-t)" stroke="#0f0d12" stroke-width="5"/>
   <path d="M60 154h150l30 150H30z" fill="url(#shadow-coat-t)" stroke="#090b1a" stroke-width="4" stroke-linejoin="round"/>
   <path d="M70 48c24-28 100-28 122 0l20 14c8 6 6 20-2 26l-12 8H64l-12-8c-8-6-10-20-2-26z" fill="#211f36"/>
   <circle cx="102" cy="94" r="7" fill="#03060f"/>
   <circle cx="154" cy="94" r="7" fill="#03060f"/>
-  <path d="M108 122c12 14 36 14 46 0" stroke="#35160c" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <path d="M92 124c18 28 58 28 76 0" stroke="#35160c" stroke-width="6" fill="none" stroke-linecap="round"/>
   <rect x="70" y="190" width="120" height="120" rx="50" fill="#343660"/>
   <path d="M38 222c-18 0-30 18-26 34s26 24 42 14 10-48-16-48z" fill="#fed0aa"/>
   <path d="M222 206c18 0 28 24 22 40s-24 26-42 14-10-54 20-54z" fill="#fed0aa"/>
