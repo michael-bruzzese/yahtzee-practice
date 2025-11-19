@@ -286,15 +286,15 @@ const triggerRollAnimation = () => {
     setMessage(null);
     try {
       setGame((prev) => {
-        const next = selectCategory(prev, category);
-        if (next.phase === "complete" || next.players.length <= 1) {
+        const nextState = selectCategory(prev, category);
+        if (nextState.phase === "complete" || nextState.players.length <= 1) {
           nextPlayerName = null;
-        } else if (next.phase === "rolling") {
-          nextPlayerName = next.players[next.currentPlayerIndex]?.name ?? null;
+        } else if (nextState.phase === "rolling") {
+          nextPlayerName = nextState.players[nextState.currentPlayerIndex]?.name ?? null;
         } else {
           nextPlayerName = null;
         }
-        return next;
+        return nextState;
       });
       setAwaitingNextPlayer(nextPlayerName);
       playSelectSound();
@@ -513,7 +513,7 @@ function Header({
       <div>
         <p className="text-sm uppercase tracking-[0.25em] text-indigo-200/80">Playful Yahtzee</p>
         <h1 className="text-3xl font-semibold text-white sm:text-4xl">Pass & Play</h1>
-        <p className="text-sm text-slate-200/80">Roll, hold, score. Pass the device and keep it friendly.</p>
+        <p className="text-sm text-slate-200/80">Roll, Hold, Score. Roll some bones!</p>
         <p className="text-xs text-slate-200/60">
           Players: {playerNames.join(" vs ")}
         </p>
@@ -1134,29 +1134,46 @@ const createNoiseBuffer = (ctx: AudioContext, duration = 0.3) => {
 };
 
 const playDiceClack = (ctx: AudioContext, start: number) => {
-  const source = ctx.createBufferSource();
-  source.buffer = createNoiseBuffer(ctx, 0.4);
-  const filter = ctx.createBiquadFilter();
-  filter.type = "bandpass";
-  filter.frequency.value = 1600;
-  filter.Q.value = 4;
-  const gain = ctx.createGain();
-  gain.gain.setValueAtTime(0.4, start);
-  gain.gain.exponentialRampToValueAtTime(0.001, start + 0.4);
-  source.connect(filter).connect(gain).connect(ctx.destination);
-  source.start(start);
-  source.stop(start + 0.4);
+  const bursts = 3;
+  for (let i = 0; i < bursts; i += 1) {
+    const delay = start + i * 0.08;
+    const bufferSource = ctx.createBufferSource();
+    bufferSource.buffer = createNoiseBuffer(ctx, 0.15);
+    const filter = ctx.createBiquadFilter();
+    filter.type = "bandpass";
+    filter.frequency.value = 1200 + Math.random() * 600;
+    filter.Q.value = 3;
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0.001, delay);
+    gain.gain.linearRampToValueAtTime(0.3, delay + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.001, delay + 0.18);
+    bufferSource.connect(filter).connect(gain).connect(ctx.destination);
+    bufferSource.start(delay);
+    bufferSource.stop(delay + 0.2);
+  }
+  const tone = ctx.createOscillator();
+  const toneGain = ctx.createGain();
+  tone.frequency.setValueAtTime(260, start);
+  tone.frequency.exponentialRampToValueAtTime(120, start + 0.25);
+  toneGain.gain.setValueAtTime(0.2, start);
+  toneGain.gain.exponentialRampToValueAtTime(0.001, start + 0.25);
+  tone.connect(toneGain).connect(ctx.destination);
+  tone.start(start);
+  tone.stop(start + 0.3);
 };
 
 const playYahtzeeApplause = (ctx: AudioContext, start: number) => {
-  const source = ctx.createBufferSource();
-  source.buffer = createNoiseBuffer(ctx, 1.3);
+  const bufferSource = ctx.createBufferSource();
+  bufferSource.buffer = createNoiseBuffer(ctx, 1.5);
+  const filter = ctx.createBiquadFilter();
+  filter.type = "highpass";
+  filter.frequency.value = 600;
   const gain = ctx.createGain();
   gain.gain.setValueAtTime(0.001, start);
-  gain.gain.linearRampToValueAtTime(0.6, start + 0.1);
-  gain.gain.setTargetAtTime(0.15, start + 0.6, 0.5);
-  gain.gain.exponentialRampToValueAtTime(0.001, start + 1.3);
-  source.connect(gain).connect(ctx.destination);
-  source.start(start);
-  source.stop(start + 1.3);
+  gain.gain.linearRampToValueAtTime(0.7, start + 0.15);
+  gain.gain.setTargetAtTime(0.2, start + 0.8, 0.4);
+  gain.gain.exponentialRampToValueAtTime(0.001, start + 1.5);
+  bufferSource.connect(filter).connect(gain).connect(ctx.destination);
+  bufferSource.start(start);
+  bufferSource.stop(start + 1.5);
 };
