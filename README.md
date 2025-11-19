@@ -32,11 +32,11 @@ Then open http://localhost:3000.
 
 ## GitHub / Deployment
 - Remote: `git@github.com:michael-bruzzese/yahtzee-practice.git` (main).
-- Deployment target: Vercel (free, vercel.app URL). Password gate will live in Next.js middleware using an env var.
+- Deployment target: Vercel (free, vercel.app URL). Password gate runs in `src/proxy.ts` using an env var.
 
 ## Password Gate (staging)
 - Set `APP_PASSWORD` in env (e.g., Vercel env vars or `.env.local`) to require Basic Auth. Without it, the site is open.
-- When set, the browser will prompt for a password (username is `user`, password is `APP_PASSWORD`).
+- When set, the browser will prompt for a password (username is `user`, password is `APP_PASSWORD`). Implemented in `src/proxy.ts`.
 
 ## Leaderboard Persistence
 - API routes: `GET /api/scores` (top 20), `POST /api/scores` with `{ players: [{ name, score }] }`.

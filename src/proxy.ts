@@ -2,7 +2,8 @@ import { NextResponse, type NextRequest } from "next/server";
 
 const password = process.env.APP_PASSWORD;
 
-export function middleware(req: NextRequest) {
+export function proxy(req: NextRequest) {
+  // If no password set, let everything through.
   if (!password) return NextResponse.next();
 
   const { pathname } = req.nextUrl;

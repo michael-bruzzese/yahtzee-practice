@@ -113,8 +113,7 @@ export default function Home() {
     game.dice ? scoreCategory(category, game.dice) : null;
 
   const gameComplete = game.phase === "complete";
-  const winner =
-    gameComplete && [...totals].sort((a, b) => b.total - a.total)[0]?.name;
+  const winner = gameComplete ? [...totals].sort((a, b) => b.total - a.total)[0]?.name : undefined;
 
   const handleSubmitScores = async () => {
     if (!gameComplete) {
