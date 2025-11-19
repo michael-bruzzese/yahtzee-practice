@@ -23,6 +23,7 @@ Then open http://localhost:3000.
 ## Project Log (for Michael/Navarre)
 - 2024-xx-xx: Scaffolded Next.js + TS + Tailwind app; git initialized (main); linked to GitHub `yahtzee-practice`.
 - 2024-xx-xx: Added Yahtzee rules/score engine with pure functions and tests (Vitest); basic game state transitions (roll/hold/select).
+- 2024-xx-xx: Replaced starter page with interactive UI (dice tray with holds, roll controls, scorecard selection, player totals); added Framer Motion for animations.
 
 ## Near-Term Plan
 - Build a Yahtzee rules/score engine with tests.
