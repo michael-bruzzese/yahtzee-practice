@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Category,
@@ -114,6 +114,7 @@ export default function Home() {
   const [awaitingNextPlayer, setAwaitingNextPlayer] = useState<string | null>(null);
   const [isRollingAnimation, setIsRollingAnimation] = useState(false);
   const [avatarPose, setAvatarPose] = useState<AvatarPose>("idle");
+  const [savingScores, setSavingScores] = useState(false);
   const animationTimers = useRef<ReturnType<typeof setTimeout>[]>([]);
   const playRollSound = useChime(soundEnabled, { type: "roll" });
   const playSelectSound = useChime(soundEnabled, { type: "select" });
@@ -316,16 +317,9 @@ export default function Home() {
   const gameComplete = game.phase === "complete";
   const winner = gameComplete ? [...totals].sort((a, b) => b.total - a.total)[0]?.name : undefined;
 
-  const handleSubmitScores = async () => {
-    if (!gameComplete) {
-      setMessage({ type: "error", text: "Finish the game before submitting scores." });
-      return;
-    }
-    if (submitted) {
-      setMessage({ type: "info", text: "Scores already submitted for this round." });
-      return;
-    }
-
+  const submitScores = useCallback(async () => {
+    if (submitted || totals.length === 0) return;
+    setSavingScores(true);
     try {
       const res = await fetch("/api/scores", {
         method: "POST",
@@ -338,11 +332,19 @@ export default function Home() {
       const data = await res.json();
       setLeaderboard(data.scores ?? []);
       setSubmitted(true);
-      setMessage({ type: "info", text: "Scores submitted to leaderboard." });
+      setMessage({ type: "info", text: "Scores saved to leaderboard." });
     } catch (err) {
       setMessage({ type: "error", text: (err as Error).message });
+    } finally {
+      setSavingScores(false);
     }
-  };
+  }, [submitted, totals]);
+
+  useEffect(() => {
+    if (gameComplete && !submitted) {
+      void submitScores();
+    }
+  }, [gameComplete, submitted, submitScores]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0b1028] via-[#101f3f] to-[#311c45] text-slate-100">
@@ -377,7 +379,7 @@ export default function Home() {
           playerNames={playerNameList}
         />
 
-        <div className="grid gap-4 lg:grid-cols-[1.2fr,0.8fr]">
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,1.15fr),minmax(0,0.85fr)]">
           <section className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm shadow-lg shadow-indigo-900/20">
             <div className="flex flex-col gap-6 p-6">
               <TopBar
@@ -395,10 +397,6 @@ export default function Home() {
                 onToggleHold={handleToggleHold}
                 rollKey={rollKey}
                 interactionLocked={Boolean(awaitingNextPlayer) || isRollingAnimation}
-                leaderboard={leaderboard}
-                leaderLoading={leaderLoading}
-                leaderError={leaderError}
-                onRefresh={loadScores}
                 isRolling={isRollingAnimation}
                 pose={avatarPose}
               />
@@ -421,17 +419,20 @@ export default function Home() {
                 <div className="flex flex-col gap-2 rounded-xl border border-emerald-300/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-50 shadow-[0_10px_40px_-20px_rgba(16,185,129,0.4)]">
                   <div className="flex items-center justify-between">
                     <span className="font-semibold">Game complete!</span>
-                    {winner ? <span className="text-xs uppercase tracking-[0.15em] text-emerald-100/80">Winner: {winner}</span> : null}
+                    {winner ? (
+                      <span className="text-xs uppercase tracking-[0.15em] text-emerald-100/80">
+                        Winner: {winner}
+                      </span>
+                    ) : null}
                   </div>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <button
-                      onClick={handleSubmitScores}
-                      type="button"
-                      className="rounded-lg bg-emerald-400/80 px-3 py-2 text-xs font-semibold text-emerald-950 shadow hover:bg-emerald-300"
-                      disabled={submitted}
-                    >
-                      {submitted ? "Submitted" : "Submit scores to leaderboard"}
-                    </button>
+                  <div className="flex flex-wrap items-center gap-3">
+                    <span className="rounded-full bg-emerald-400/20 px-3 py-1 text-xs font-semibold text-emerald-100">
+                      {savingScores
+                        ? "Saving scores…"
+                        : submitted
+                          ? "Scores saved to leaderboard"
+                          : "Preparing leaderboard…"}
+                    </span>
                     <button
                       onClick={handleNewGame}
                       type="button"
@@ -472,6 +473,12 @@ export default function Home() {
               potentialScore={potentialScore}
             />
             <PlayerTotals totals={totals} currentIndex={game.currentPlayerIndex} />
+            <Leaderboard
+              scores={leaderboard}
+              loading={leaderLoading}
+              error={leaderError}
+              onRefresh={loadScores}
+            />
           </section>
         </div>
       </div>
@@ -497,9 +504,7 @@ function Header({
       <div>
         <p className="text-sm uppercase tracking-[0.25em] text-indigo-200/80">Playful Yahtzee</p>
         <h1 className="text-3xl font-semibold text-white sm:text-4xl">Pass & Play</h1>
-        <p className="text-sm text-slate-200/80">
-          Roll, hold, score. Smooth animations and a playful vibe.
-        </p>
+        <p className="text-sm text-slate-200/80">Roll, hold, score. Pass the device and keep it friendly.</p>
         <p className="text-xs text-slate-200/60">
           Players: {playerNames.join(" vs ")}
         </p>
@@ -584,10 +589,6 @@ function TableScene({
   onToggleHold,
   rollKey,
   interactionLocked,
-  leaderboard,
-  leaderLoading,
-  leaderError,
-  onRefresh,
   isRolling,
   pose,
 }: {
@@ -597,10 +598,6 @@ function TableScene({
   onToggleHold: (index: number) => void;
   rollKey: number;
   interactionLocked: boolean;
-  leaderboard: ScoreEntry[];
-  leaderLoading: boolean;
-  leaderError: string | null;
-  onRefresh: () => void;
   isRolling: boolean;
   pose: AvatarPose;
 }) {
@@ -643,13 +640,6 @@ function TableScene({
             />
           ))}
         </div>
-
-        <LeaderboardBackdrop
-          scores={leaderboard}
-          loading={leaderLoading}
-          error={leaderError}
-          onRefresh={onRefresh}
-        />
       </div>
       <p className="mt-3 text-center text-xs text-slate-200/80">
         Hold dice with a tap. Rolling animates the throw onto the felt.
@@ -927,57 +917,6 @@ function PlayerTotals({
           </div>
         ))}
       </div>
-    </div>
-  );
-}
-
-function LeaderboardBackdrop({
-  scores,
-  loading,
-  error,
-  onRefresh,
-}: {
-  scores: ScoreEntry[];
-  loading: boolean;
-  error: string | null;
-  onRefresh: () => void;
-}) {
-  const top = scores.slice(0, 4);
-  return (
-    <div className="absolute right-6 top-6 w-64 rounded-2xl border border-cyan-200/30 bg-[#081530]/90 p-4 text-white shadow-lg shadow-cyan-500/10 backdrop-blur">
-      <div className="flex items-center justify-between text-xs uppercase tracking-[0.3em] text-cyan-100/70">
-        <span>Leaders</span>
-        <button
-          type="button"
-          onClick={onRefresh}
-          className="text-[10px] font-semibold text-cyan-200 underline decoration-dotted"
-        >
-          Refresh
-        </button>
-      </div>
-      <div className="mt-2 text-[10px] uppercase tracking-[0.4em] text-cyan-200/60">Top Scores</div>
-      {loading ? (
-        <p className="mt-4 text-sm text-cyan-100/70">Loading…</p>
-      ) : error ? (
-        <p className="mt-4 text-sm text-rose-200">{error}</p>
-      ) : top.length === 0 ? (
-        <p className="mt-4 text-sm text-cyan-100/70">No scores yet.</p>
-      ) : (
-        <div className="mt-3 flex flex-col gap-2">
-          {top.map((entry, idx) => (
-            <div
-              key={entry.id ?? `${entry.name}-${idx}`}
-              className="flex items-center justify-between rounded-xl bg-white/5 px-3 py-2 text-sm"
-            >
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-cyan-200/80">#{idx + 1}</span>
-                <span className="font-semibold">{entry.name}</span>
-              </div>
-              <span className="text-base font-bold text-cyan-100">{entry.score}</span>
-            </div>
-          ))}
-        </div>
-      )}
     </div>
   );
 }

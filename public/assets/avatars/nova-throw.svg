@@ -1,17 +1,27 @@
-<svg width="240" height="320" viewBox="0 0 240 320" xmlns="http://www.w3.org/2000/svg">
-  <rect width="240" height="320" fill="none"/>
-  <g>
-    <ellipse cx="120" cy="300" rx="70" ry="16" fill="#0f4d31" opacity="0.25"/>
-    <circle cx="120" cy="80" r="55" fill="#ffd5e5" stroke="#111b2b" stroke-width="4"/>
-    <path d="M68 130h104l18 110H50z" fill="#6d28d9"/>
-    <path d="M70 55c30-40 70-40 100 0" stroke="#f0abfc" stroke-width="18" stroke-linecap="round"/>
-    <circle cx="95" cy="80" r="6" fill="#111827"/>
-    <circle cx="145" cy="80" r="6" fill="#111827"/>
-    <path d="M100 105c10 14 32 14 40 0" stroke="#312e81" stroke-width="5" fill="none"/>
-    <rect x="72" y="170" width="96" height="130" rx="44" fill="#7c3aed"/>
-    <path d="M32 214c-16-10-30-4-34 6s8 22 32 20 26-18 2-26z" fill="#ffd5e5"/>
-    <rect x="164" y="170" width="26" height="110" rx="13" fill="#ffd5e5" transform="rotate(20 177 225)"/>
-    <rect x="78" y="260" width="24" height="60" rx="12" fill="#c4b5fd"/>
-    <rect x="138" y="260" width="24" height="60" rx="12" fill="#c4b5fd"/>
-  </g>
+<svg width="260" height="340" viewBox="0 0 260 340" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="nova-t-suit" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#7c46ec"/>
+      <stop offset="100%" stop-color="#311055"/>
+    </linearGradient>
+    <radialGradient id="nova-t-skin" cx="50%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#ffd3e7"/>
+      <stop offset="100%" stop-color="#f5a0c8"/>
+    </radialGradient>
+  </defs>
+  <rect width="260" height="340" fill="none"/>
+  <ellipse cx="126" cy="316" rx="94" ry="22" fill="#0d052c" opacity="0.35"/>
+  <circle cx="132" cy="90" r="70" fill="url(#nova-t-skin)" stroke="#220829" stroke-width="5"/>
+  <path d="M44 86c32-50 154-52 184 2l-16 26H60z" fill="#e8b7ff"/>
+  <circle cx="110" cy="98" r="7" fill="#2f1041"/>
+  <circle cx="158" cy="98" r="7" fill="#2f1041"/>
+  <path d="M112 122c12 18 40 18 50 0" stroke="#5f1c8d" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <path d="M50 160h160l30 150H20z" fill="url(#nova-t-suit)" stroke="#270b49" stroke-width="4" stroke-linejoin="round"/>
+  <rect x="74" y="198" width="124" height="134" rx="56" fill="#a36dff"/>
+  <path d="M26 228c-18 0-28 24-20 40s32 20 46 8 6-48-26-48z" fill="#ffd3e7"/>
+  <path d="M226 208c18 0 30 30 22 48s-32 20-44 4 0-52 22-52z" fill="#ffd3e7"/>
+  <rect x="92" y="272" width="30" height="60" rx="15" fill="#e1d5ff"/>
+  <rect x="142" y="272" width="30" height="60" rx="15" fill="#e1d5ff"/>
+  <path d="M238 220c20-10 38-8 44 4s-4 24-26 26-34-12-18-30z" fill="#ffd3e7"/>
+  <path d="M22 246c-14-6-18 4-14 18s24 18 32 8 4-22-18-26z" fill="#ffd3e7"/>
 </svg>

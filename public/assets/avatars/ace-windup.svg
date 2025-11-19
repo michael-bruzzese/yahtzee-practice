@@ -1,20 +1,27 @@
-<svg width="240" height="320" viewBox="0 0 240 320" xmlns="http://www.w3.org/2000/svg">
-  <rect width="240" height="320" fill="none"/>
-  <g>
-    <ellipse cx="120" cy="300" rx="70" ry="16" fill="#0f4d31" opacity="0.3"/>
-    <circle cx="120" cy="80" r="58" fill="#fbd38d" stroke="#1f2937" stroke-width="4"/>
-    <path d="M80 120h80l10 80H70z" fill="#1c243b"/>
-    <rect x="85" y="90" width="70" height="20" rx="10" fill="#f8c065"/>
-    <rect x="104" y="10" width="32" height="18" fill="#111827"/>
-    <rect x="70" y="26" width="100" height="24" rx="12" fill="#111827"/>
-    <circle cx="95" cy="70" r="6" fill="#111827"/>
-    <circle cx="145" cy="70" r="6" fill="#111827"/>
-    <path d="M105 96c6 8 24 8 30 0" stroke="#111827" stroke-width="4" fill="none" stroke-linecap="round"/>
-    <rect x="60" y="150" width="120" height="70" rx="20" fill="#1f2f5b"/>
-    <rect x="60" y="190" width="120" height="100" rx="30" fill="#111827"/>
-    <rect x="82" y="250" width="24" height="60" rx="12" fill="#e0e7ff"/>
-    <rect x="134" y="250" width="24" height="60" rx="12" fill="#e0e7ff"/>
-    <path d="M48 210c-10-30 0-70 20-60s18 24 8 50" fill="#fbd38d"/>
-    <rect x="174" y="170" width="26" height="110" rx="13" fill="#fbd38d" transform="rotate(-20 187 225)"/>
-  </g>
+<svg width="260" height="340" viewBox="0 0 260 340" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="ace-suit-windup" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#141a36"/>
+      <stop offset="100%" stop-color="#050814"/>
+    </linearGradient>
+    <radialGradient id="ace-face" cx="50%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#ffdcb3"/>
+      <stop offset="100%" stop-color="#f1b97d"/>
+    </radialGradient>
+  </defs>
+  <rect width="260" height="340" fill="none"/>
+  <ellipse cx="130" cy="315" rx="85" ry="20" fill="#041b16" opacity="0.35"/>
+  <circle cx="130" cy="95" r="70" fill="url(#ace-face)" stroke="#140d0f" stroke-width="5"/>
+  <path d="M55 160h150l15 130H40z" fill="url(#ace-suit-windup)" stroke="#070b19" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M122 36c10-10 36-8 46 4l34 18c7 3 8 15 2 22l-12 16H75l-12-16c-6-7-5-19 2-22l34-18c6-3 21-4 31-4z" fill="#0b1122"/>
+  <circle cx="100" cy="98" r="7" fill="#0f1427"/>
+  <circle cx="160" cy="98" r="7" fill="#0f1427"/>
+  <path d="M112 128c10 12 32 12 44 0" stroke="#38150a" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <rect x="68" y="180" width="124" height="130" rx="56" fill="#1d2f62"/>
+  <path d="M50 200c-14 0-22 32-12 52s30 16 42-6-6-46-30-46z" fill="#ffd2a4"/>
+  <path d="M210 206c12 0 24 20 22 40s-18 32-36 22-12-62 14-62z" fill="#ffd2a4"/>
+  <rect x="88" y="265" width="28" height="60" rx="14" fill="#dbdef7"/>
+  <rect x="144" y="265" width="28" height="60" rx="14" fill="#dbdef7"/>
+  <path d="M50 215c-12-34 2-72 26-56s20 32 10 60" fill="#ffd5ac"/>
+  <path d="M212 220c14-32 6-58-16-56s-22 24-16 50" fill="#ffd5ac"/>
 </svg>

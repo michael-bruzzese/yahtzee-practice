@@ -1,17 +1,27 @@
-<svg width="240" height="320" viewBox="0 0 240 320" xmlns="http://www.w3.org/2000/svg">
-  <rect width="240" height="320" fill="none"/>
-  <g>
-    <ellipse cx="120" cy="300" rx="70" ry="16" fill="#0f4d31" opacity="0.25"/>
-    <circle cx="120" cy="85" r="58" fill="#fdd5a3" stroke="#1f2937" stroke-width="4"/>
-    <path d="M60 140h120l16 110H44z" fill="#f97316"/>
-    <path d="M60 70c20-40 100-40 120 0" stroke="#facc15" stroke-width="30" stroke-linecap="round" fill="none"/>
-    <circle cx="95" cy="80" r="6" fill="#111827"/>
-    <circle cx="145" cy="80" r="6" fill="#111827"/>
-    <path d="M102 110c10 18 30 18 38 0" stroke="#c2410c" stroke-width="5" fill="none"/>
-    <rect x="70" y="170" width="100" height="130" rx="42" fill="#fb923c"/>
-    <path d="M34 218c-14-12-28-6-32 4s6 20 26 20 30-16 6-24z" fill="#fdd5a3"/>
-    <rect x="166" y="170" width="26" height="110" rx="13" fill="#fdd5a3" transform="rotate(18 179 225)"/>
-    <rect x="70" y="260" width="24" height="60" rx="12" fill="#fde68a"/>
-    <rect x="146" y="260" width="24" height="60" rx="12" fill="#fde68a"/>
-  </g>
+<svg width="260" height="340" viewBox="0 0 260 340" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="sunny-t-dress" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ff9149"/>
+      <stop offset="100%" stop-color="#c53214"/>
+    </linearGradient>
+    <radialGradient id="sunny-t-skin" cx="50%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#ffd7ba"/>
+      <stop offset="100%" stop-color="#f1a585"/>
+    </radialGradient>
+  </defs>
+  <rect width="260" height="340" fill="none"/>
+  <ellipse cx="124" cy="316" rx="94" ry="22" fill="#1a0701" opacity="0.25"/>
+  <circle cx="130" cy="88" r="70" fill="url(#sunny-t-skin)" stroke="#1c120e" stroke-width="5"/>
+  <path d="M38 90c30-58 150-58 180 0l-14 28H52z" fill="#ffc160"/>
+  <circle cx="106" cy="100" r="7" fill="#1a100c"/>
+  <circle cx="160" cy="100" r="7" fill="#1a100c"/>
+  <path d="M112 125c12 16 34 16 42 0" stroke="#b03618" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <path d="M54 160h150l30 150H24z" fill="url(#sunny-t-dress)" stroke="#851b05" stroke-width="4" stroke-linejoin="round"/>
+  <rect x="78" y="198" width="112" height="128" rx="52" fill="#ffb55f"/>
+  <path d="M20 228c-18 0-24 24-14 40s34 18 46 4 6-44-32-44z" fill="#ffd5b1"/>
+  <path d="M220 210c20 0 30 24 20 42s-32 22-44 8-8-50 24-50z" fill="#ffd5b1"/>
+  <rect x="92" y="270" width="30" height="60" rx="15" fill="#ffe3aa"/>
+  <rect x="138" y="270" width="30" height="60" rx="15" fill="#ffe3aa"/>
+  <path d="M36 236c-18-8-32-2-34 12s10 24 32 22 24-28 2-34z" fill="#ffd5b1"/>
+  <path d="M230 214c22-10 36-6 42 8s-4 26-26 26-32-20-16-34z" fill="#ffd5b1"/>
 </svg>

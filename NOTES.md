@@ -7,7 +7,8 @@ Keep this file updated at the end of each session so future work has context.
 - Tests: `npm test` (Vitest). Do not pass `--runInBand`; Vitest does not support that flag.
 - Leaderboard persistence: wired to Neon Postgres (`POSTGRES_URL` in `.env.local`). Verified by hitting `/api/scores` (GET and POST) while `next dev` was running; rows persisted and read back successfully.
 - UX: Added player-edit modal (restarts game with personalized names) and a pass-to-next-player overlay that locks controls until the next player acknowledges.
-- Visuals/flow: Added four Simpsons-style avatars (with windup/throw frames), craps-style felt scene, dice image set, and a new onboarding flow that forces avatar/name selection before a game. Roll button now triggers a brief animation (avatar pose shift + dice blur) while the leaderboard panel sits behind the avatar. Modal now has a sticky footer (“Save & start” / “Skip for now”) so it’s obvious how to begin.
+- Visuals/flow: Avatars refreshed with richer art, table stays on the left, and the scoring column (scorecard + leaderboard) now lives on the right so players can log scores without scrolling.
+- Leaderboard: auto-submits at game completion—no button required—and refreshes immediately when a round ends.
 - Pending: capture polish ideas (better animation timing, richer dice physics/audio, art refinements) as they arise.
 
 ## TODO / Next steps

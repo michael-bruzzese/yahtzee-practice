@@ -1,20 +1,26 @@
-<svg width="240" height="320" viewBox="0 0 240 320" xmlns="http://www.w3.org/2000/svg">
-  <rect width="240" height="320" fill="none"/>
-  <g transform="translate(0,0)">
-    <ellipse cx="120" cy="300" rx="70" ry="16" fill="#0f4d31" opacity="0.3"/>
-    <circle cx="120" cy="80" r="58" fill="#fbd38d" stroke="#1f2937" stroke-width="4"/>
-    <path d="M80 120h80l10 80H70z" fill="#1c243b"/>
-    <rect x="85" y="90" width="70" height="20" rx="10" fill="#f8c065"/>
-    <rect x="104" y="10" width="32" height="18" fill="#111827"/>
-    <rect x="70" y="26" width="100" height="24" rx="12" fill="#111827"/>
-    <circle cx="95" cy="70" r="6" fill="#111827"/>
-    <circle cx="145" cy="70" r="6" fill="#111827"/>
-    <path d="M105 96c6 8 24 8 30 0" stroke="#111827" stroke-width="4" fill="none" stroke-linecap="round"/>
-    <rect x="60" y="190" width="120" height="100" rx="30" fill="#111827"/>
-    <rect x="60" y="150" width="120" height="70" rx="20" fill="#1f2f5b"/>
-    <rect x="40" y="170" width="26" height="110" rx="13" fill="#fbd38d"/>
-    <rect x="174" y="170" width="26" height="110" rx="13" fill="#fbd38d"/>
-    <rect x="82" y="250" width="24" height="60" rx="12" fill="#e0e7ff"/>
-    <rect x="134" y="250" width="24" height="60" rx="12" fill="#e0e7ff"/>
-  </g>
+<svg width="260" height="340" viewBox="0 0 260 340" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="ace-suit" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#192042"/>
+      <stop offset="100%" stop-color="#0b0f26"/>
+    </linearGradient>
+    <radialGradient id="ace-highlight" cx="50%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#ffdfb1"/>
+      <stop offset="100%" stop-color="#f1b97d"/>
+    </radialGradient>
+  </defs>
+  <rect width="260" height="340" fill="none"/>
+  <ellipse cx="130" cy="315" rx="80" ry="18" fill="#041b16" opacity="0.35"/>
+  <circle cx="130" cy="95" r="70" fill="url(#ace-highlight)" stroke="#140d0f" stroke-width="5"/>
+  <path d="M60 160h140l30 120H30z" fill="url(#ace-suit)" stroke="#090c1a" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M105 45c0-14 50-14 50 0l25 12c6 3 10 13 4 20l-8 10H84l-8-10c-6-7-2-17 4-20l25-12z" fill="#11172d"/>
+  <circle cx="100" cy="95" r="8" fill="#111827"/>
+  <circle cx="160" cy="95" r="8" fill="#111827"/>
+  <path d="M105 130c12 18 38 18 50 0" stroke="#311309" stroke-width="7" fill="none" stroke-linecap="round"/>
+  <rect x="70" y="185" width="120" height="110" rx="48" fill="#1c2c5a"/>
+  <path d="M68 180c-10 0-22 18-24 38-2 20 6 34 18 34 20 0 39-56 6-72z" fill="#ffcc9c"/>
+  <path d="M192 180c10 0 22 18 24 38 2 20-6 34-18 34-20 0-39-56-6-72z" fill="#ffcc9c"/>
+  <rect x="88" y="260" width="30" height="60" rx="15" fill="#d5dffd"/>
+  <rect x="142" y="260" width="30" height="60" rx="15" fill="#d5dffd"/>
+  <path d="M88 205c12-18 72-18 84 0l-42 60z" fill="#f9a826" opacity="0.8"/>
 </svg>

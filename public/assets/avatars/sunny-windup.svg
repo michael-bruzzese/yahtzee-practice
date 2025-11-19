@@ -1,17 +1,30 @@
-<svg width="240" height="320" viewBox="0 0 240 320" xmlns="http://www.w3.org/2000/svg">
-  <rect width="240" height="320" fill="none"/>
-  <g>
-    <ellipse cx="120" cy="300" rx="70" ry="16" fill="#0f4d31" opacity="0.25"/>
-    <circle cx="120" cy="85" r="58" fill="#fdd5a3" stroke="#1f2937" stroke-width="4"/>
-    <path d="M60 140h120l16 110H44z" fill="#f97316"/>
-    <path d="M60 70c20-40 100-40 120 0" stroke="#facc15" stroke-width="30" stroke-linecap="round" fill="none"/>
-    <circle cx="95" cy="80" r="6" fill="#111827"/>
-    <circle cx="145" cy="80" r="6" fill="#111827"/>
-    <path d="M102 110c10 18 30 18 38 0" stroke="#c2410c" stroke-width="5" fill="none"/>
-    <rect x="70" y="170" width="100" height="130" rx="42" fill="#fb923c"/>
-    <rect x="48" y="170" width="26" height="110" rx="13" fill="#fdd5a3" transform="rotate(-25 61 225)"/>
-    <path d="M184 220c8-32 0-60-18-56s-16 24-8 52" fill="#fdd5a3"/>
-    <rect x="70" y="260" width="24" height="60" rx="12" fill="#fde68a"/>
-    <rect x="146" y="260" width="24" height="60" rx="12" fill="#fde68a"/>
-  </g>
+<svg width="260" height="340" viewBox="0 0 260 340" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="sunny-w-dress" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ff9346"/>
+      <stop offset="100%" stop-color="#c73a17"/>
+    </linearGradient>
+    <radialGradient id="sunny-w-skin" cx="50%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#ffd8bd"/>
+      <stop offset="100%" stop-color="#f1a987"/>
+    </radialGradient>
+    <radialGradient id="sunny-w-hair" cx="50%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#ffe37a"/>
+      <stop offset="100%" stop-color="#ffb04c"/>
+    </radialGradient>
+  </defs>
+  <rect width="260" height="340" fill="none"/>
+  <ellipse cx="138" cy="316" rx="92" ry="20" fill="#1c0901" opacity="0.25"/>
+  <circle cx="130" cy="90" r="70" fill="url(#sunny-w-skin)" stroke="#1f110c" stroke-width="5"/>
+  <path d="M52 86c30-58 132-56 164 2l-12 24H64z" fill="url(#sunny-w-hair)"/>
+  <circle cx="110" cy="100" r="7" fill="#1a110d"/>
+  <circle cx="158" cy="100" r="7" fill="#1a110d"/>
+  <path d="M112 124c14 18 32 18 42 0" stroke="#b43d1c" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <path d="M60 156h136l30 140H40z" fill="url(#sunny-w-dress)" stroke="#8a2306" stroke-width="4" stroke-linejoin="round"/>
+  <rect x="84" y="188" width="104" height="128" rx="48" fill="#ffbf6c"/>
+  <path d="M58 192c-18-6-30 26-22 46s34 20 44 0 0-42-22-46z" fill="#ffd5b8"/>
+  <path d="M212 210c18-6 30 20 22 40-8 20-34 22-44 6s0-44 22-46z" fill="#ffd5b8"/>
+  <rect x="94" y="266" width="28" height="60" rx="14" fill="#ffe3a2"/>
+  <rect x="142" y="266" width="28" height="60" rx="14" fill="#ffe3a2"/>
+  <path d="M34 214c-14-12-30-6-32 6s4 24 24 26 30-20 8-32z" fill="#ffd5b8"/>
 </svg>

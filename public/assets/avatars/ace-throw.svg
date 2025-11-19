@@ -1,20 +1,27 @@
-<svg width="240" height="320" viewBox="0 0 240 320" xmlns="http://www.w3.org/2000/svg">
-  <rect width="240" height="320" fill="none"/>
-  <g>
-    <ellipse cx="120" cy="300" rx="70" ry="16" fill="#0f4d31" opacity="0.3"/>
-    <circle cx="120" cy="80" r="58" fill="#fbd38d" stroke="#1f2937" stroke-width="4"/>
-    <path d="M80 120h80l10 80H70z" fill="#1c243b"/>
-    <rect x="85" y="90" width="70" height="20" rx="10" fill="#f8c065"/>
-    <rect x="104" y="10" width="32" height="18" fill="#111827"/>
-    <rect x="70" y="26" width="100" height="24" rx="12" fill="#111827"/>
-    <circle cx="95" cy="70" r="6" fill="#111827"/>
-    <circle cx="145" cy="70" r="6" fill="#111827"/>
-    <path d="M105 96c6 8 24 8 30 0" stroke="#111827" stroke-width="4" fill="none" stroke-linecap="round"/>
-    <rect x="60" y="150" width="120" height="70" rx="20" fill="#1f2f5b"/>
-    <rect x="60" y="190" width="120" height="100" rx="30" fill="#111827"/>
-    <rect x="82" y="250" width="24" height="60" rx="12" fill="#e0e7ff"/>
-    <rect x="134" y="250" width="24" height="60" rx="12" fill="#e0e7ff"/>
-    <rect x="40" y="190" width="26" height="110" rx="13" fill="#fbd38d" transform="rotate(20 53 245)"/>
-    <path d="M190 210c12-12 26-12 32-6s6 20-10 26-32-4-22-20z" fill="#fbd38d"/>
-  </g>
+<svg width="260" height="340" viewBox="0 0 260 340" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="ace-throw-suit" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#101736"/>
+      <stop offset="100%" stop-color="#050713"/>
+    </linearGradient>
+    <radialGradient id="ace-throw-face" cx="50%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#ffe3c1"/>
+      <stop offset="100%" stop-color="#f5bc82"/>
+    </radialGradient>
+  </defs>
+  <rect width="260" height="340" fill="none"/>
+  <ellipse cx="130" cy="315" rx="90" ry="20" fill="#02140f" opacity="0.35"/>
+  <circle cx="130" cy="95" r="70" fill="url(#ace-throw-face)" stroke="#120b0f" stroke-width="5"/>
+  <path d="M45 165h150l30 135H20z" fill="url(#ace-throw-suit)" stroke="#070a18" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M115 34c12-12 50-10 60 4l28 10c8 3 12 15 4 24l-10 14H63l-10-14c-6-9-4-21 4-24l28-10c6-2 21-3 30-4z" fill="#08102a"/>
+  <circle cx="98" cy="96" r="7" fill="#050912"/>
+  <circle cx="162" cy="96" r="7" fill="#050912"/>
+  <path d="M110 129c10 16 34 16 44 0" stroke="#3a1a0a" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <rect x="62" y="185" width="136" height="130" rx="60" fill="#172041"/>
+  <path d="M24 228c-20-10-24 16-16 32s30 20 44 8 0-38-28-40z" fill="#ffd7b3"/>
+  <path d="M236 214c18 0 26 26 18 42s-34 18-48 6 0-48 30-48z" fill="#ffd7b3"/>
+  <rect x="90" y="268" width="30" height="60" rx="15" fill="#d6e0ff"/>
+  <rect x="142" y="268" width="30" height="60" rx="15" fill="#d6e0ff"/>
+  <path d="M210 216c20-10 36-10 44-2s8 24-10 30-44-4-34-28z" fill="#ffd1a8"/>
+  <path d="M36 240c-18 8-30 2-34-10s2-26 24-26 28 18 10 36z" fill="#ffd1a8"/>
 </svg>

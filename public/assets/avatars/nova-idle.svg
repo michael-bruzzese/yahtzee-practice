@@ -1,17 +1,29 @@
-<svg width="240" height="320" viewBox="0 0 240 320" xmlns="http://www.w3.org/2000/svg">
-  <rect width="240" height="320" fill="none"/>
-  <g>
-    <ellipse cx="120" cy="300" rx="70" ry="16" fill="#0f4d31" opacity="0.25"/>
-    <circle cx="120" cy="80" r="55" fill="#ffd5e5" stroke="#111b2b" stroke-width="4"/>
-    <path d="M68 130h104l18 110H50z" fill="#6d28d9"/>
-    <circle cx="95" cy="80" r="6" fill="#111827"/>
-    <circle cx="145" cy="80" r="6" fill="#111827"/>
-    <path d="M100 105c10 14 32 14 40 0" stroke="#312e81" stroke-width="5" fill="none"/>
-    <path d="M70 55c30-40 70-40 100 0" stroke="#f0abfc" stroke-width="18" stroke-linecap="round"/>
-    <rect x="72" y="170" width="96" height="130" rx="44" fill="#7c3aed"/>
-    <rect x="50" y="170" width="26" height="110" rx="13" fill="#ffd5e5"/>
-    <rect x="164" y="170" width="26" height="110" rx="13" fill="#ffd5e5"/>
-    <rect x="78" y="260" width="24" height="60" rx="12" fill="#c4b5fd"/>
-    <rect x="138" y="260" width="24" height="60" rx="12" fill="#c4b5fd"/>
-  </g>
+<svg width="260" height="340" viewBox="0 0 260 340" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="nova-suit" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#784bdf"/>
+      <stop offset="100%" stop-color="#3a1c7a"/>
+    </linearGradient>
+    <radialGradient id="nova-skin" cx="50%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#ffd9ea"/>
+      <stop offset="100%" stop-color="#f7a9c6"/>
+    </radialGradient>
+    <radialGradient id="nova-hair" cx="50%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#f8d5ff"/>
+      <stop offset="100%" stop-color="#c769ff"/>
+    </radialGradient>
+  </defs>
+  <rect width="260" height="340" fill="none"/>
+  <ellipse cx="130" cy="316" rx="84" ry="20" fill="#080421" opacity="0.35"/>
+  <circle cx="130" cy="90" r="70" fill="url(#nova-skin)" stroke="#220b29" stroke-width="5"/>
+  <path d="M54 80c30-40 124-42 150 0l20 30H34z" fill="url(#nova-hair)"/>
+  <circle cx="108" cy="100" r="7" fill="#2f133f"/>
+  <circle cx="152" cy="100" r="7" fill="#2f133f"/>
+  <path d="M108 124c12 18 38 18 48 0" stroke="#5c1a89" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <path d="M56 158h148l24 140H32z" fill="url(#nova-suit)" stroke="#2b0c4e" stroke-width="4" stroke-linejoin="round"/>
+  <rect x="80" y="188" width="112" height="130" rx="50" fill="#a07bff"/>
+  <path d="M42 206c-18 0-24 30-14 48s36 16 46-4-2-44-32-44z" fill="#ffd9ea"/>
+  <path d="M220 208c18-4 30 26 20 44s-34 20-46 4 0-44 26-48z" fill="#ffd9ea"/>
+  <rect x="90" y="266" width="30" height="60" rx="15" fill="#d8c6ff"/>
+  <rect x="140" y="266" width="30" height="60" rx="15" fill="#d8c6ff"/>
 </svg>
