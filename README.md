@@ -17,10 +17,12 @@ Then open http://localhost:3000.
 ## Scripts
 - `npm run dev` – run locally
 - `npm run lint` – lint the project
+- `npm test` – run rule-engine tests (Vitest)
 - `npm run build` / `npm start` – production build/serve
 
 ## Project Log (for Michael/Navarre)
 - 2024-xx-xx: Scaffolded Next.js + TS + Tailwind app; git initialized (main); linked to GitHub `yahtzee-practice`.
+- 2024-xx-xx: Added Yahtzee rules/score engine with pure functions and tests (Vitest); basic game state transitions (roll/hold/select).
 
 ## Near-Term Plan
 - Build a Yahtzee rules/score engine with tests.
