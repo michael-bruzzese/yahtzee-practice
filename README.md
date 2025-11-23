@@ -20,6 +20,14 @@ Then open http://localhost:3000.
 - `npm test` – run rule-engine tests (Vitest)
 - `npm run build` / `npm start` – production build/serve
 
+## Testing
+- `npm run test:unit` – run Vitest suite once
+- `npm run test:ci` – Vitest with coverage gate (70%+ lines/branches/functions/statements)
+- `npm run test:e2e` – Playwright E2E (builds first, then runs against `next start` with Basic Auth enabled via `APP_PASSWORD`)
+- Coverage reports are emitted to `coverage/` (lcov + text).
+
+E2E runs behind the password gate using `APP_PASSWORD` (default `previewpw` in Playwright config). If you change it locally, set `APP_PASSWORD` before running `npm run test:e2e`.
+
 ## Project Log (for Michael/Navarre)
 - 2024-xx-xx: Scaffolded Next.js + TS + Tailwind app; git initialized (main); linked to GitHub `yahtzee-practice`.
 - 2024-xx-xx: Added Yahtzee rules/score engine with pure functions and tests (Vitest); basic game state transitions (roll/hold/select).
