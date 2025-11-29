@@ -18,14 +18,14 @@ type UIMessage = { type: "error" | "info"; text: string };
 
 type AvatarPose = "idle" | "windup" | "throw";
 
-type AvatarOption = {
+export type AvatarOption = {
   id: string;
   label: string;
   role: string;
   frames: Record<AvatarPose, string>;
 };
 
-const avatarOptions: AvatarOption[] = [
+export const avatarOptions: AvatarOption[] = [
   {
     id: "ace",
     label: "Ace Highroller",
@@ -71,6 +71,29 @@ const avatarOptions: AvatarOption[] = [
 const getAvatar = (id: string) =>
   avatarOptions.find((option) => option.id === id) ?? avatarOptions[0];
 
+export const bestAvailableScore = (game: GameState): { category: Category | null; score: number } => {
+  if (!game.dice) return { category: null, score: 0 };
+  const player = game.players[game.currentPlayerIndex];
+  const available = allCategories.filter((cat) => typeof player.scorecard[cat] !== "number");
+  let best: { category: Category | null; score: number } = { category: null, score: 0 };
+  available.forEach((category) => {
+    const score = scoreCategory(category, game.dice as DiceRoll);
+    if (score > best.score) {
+      best = { category, score };
+    }
+  });
+  return best;
+};
+
+export const isSuboptimalChoice = (game: GameState, category: Category): boolean => {
+  if (!game.dice) return false;
+  const player = game.players[game.currentPlayerIndex];
+  if (typeof player.scorecard[category] === "number") return false;
+  const chosen = scoreCategory(category, game.dice);
+  const best = bestAvailableScore(game);
+  return best.score > chosen;
+};
+
 type PlayerProfile = {
   name: string;
   avatarId: AvatarOption["id"];
@@ -110,6 +133,7 @@ export default function Home() {
   const [leaderError, setLeaderError] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
+  const [suboptimalAcknowledged, setSuboptimalAcknowledged] = useState(false);
   const [showPlayerSetup, setShowPlayerSetup] = useState(true);
   const [awaitingNextPlayer, setAwaitingNextPlayer] = useState<string | null>(null);
   const [isRollingAnimation, setIsRollingAnimation] = useState(false);
@@ -151,6 +175,11 @@ export default function Home() {
   useEffect(() => {
     setAvatarPose("idle");
   }, [game.currentPlayerIndex]);
+
+  useEffect(() => {
+    // New dice -> reset suboptimal guard.
+    setSuboptimalAcknowledged(false);
+  }, [game.dice]);
 
   const loadScores = async () => {
     setLeaderLoading(true);
@@ -285,6 +314,12 @@ const triggerRollAnimation = () => {
     let nextPlayerName: string | null = null;
     setMessage(null);
     try {
+      if (isSuboptimalChoice(game, category) && !suboptimalAcknowledged) {
+        setMessage({ type: "info", text: "That's not the best way to score!" });
+        setSuboptimalAcknowledged(true);
+        return;
+      }
+
       setGame((prev) => {
         const nextState = selectCategory(prev, category);
         if (nextState.phase === "complete" || nextState.players.length <= 1) {
@@ -296,6 +331,10 @@ const triggerRollAnimation = () => {
         }
         return nextState;
       });
+      if (isSuboptimalChoice(game, category) && suboptimalAcknowledged) {
+        setMessage({ type: "info", text: "Well, Ok then!" });
+      }
+      setSuboptimalAcknowledged(false);
       setAwaitingNextPlayer(nextPlayerName);
       playSelectSound();
       if (shouldCelebrateYahtzee) {
@@ -895,7 +934,7 @@ function Leaderboard({
   );
 }
 
-function PlayerTotals({
+export function PlayerTotals({
   totals,
   currentIndex,
 }: {
@@ -921,6 +960,14 @@ function PlayerTotals({
             <div className="flex items-center gap-2">
               <span className="inline-flex h-2.5 w-2.5 rounded-full bg-white/60" />
               <span className="font-medium">{player.name}</span>
+              {idx === currentIndex && (
+                <span
+                  data-testid={`turn-indicator-${idx}`}
+                  className="rounded-full bg-emerald-400/20 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-emerald-50"
+                >
+                  Current turn
+                </span>
+              )}
             </div>
             <span className="text-base font-semibold">{player.total}</span>
           </div>

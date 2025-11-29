@@ -32,8 +32,10 @@ describe("scoreCategory", () => {
     expect(scoreCategory("fullHouse", roll([2, 2, 3, 3, 3]))).toBe(25);
     expect(scoreCategory("fullHouse", roll([2, 2, 2, 3, 4]))).toBe(0);
     expect(scoreCategory("smallStraight", roll([1, 2, 3, 4, 6]))).toBe(30);
+    expect(scoreCategory("smallStraight", roll([2, 3, 4, 4, 5]))).toBe(30); // duplicates allowed
     expect(scoreCategory("smallStraight", roll([1, 2, 2, 5, 6]))).toBe(0);
     expect(scoreCategory("largeStraight", roll([2, 3, 4, 5, 6]))).toBe(40);
+    expect(scoreCategory("largeStraight", roll([6, 4, 2, 5, 3]))).toBe(40); // unsorted still counts
     expect(scoreCategory("largeStraight", roll([1, 2, 2, 3, 4]))).toBe(0);
     expect(scoreCategory("yahtzee", roll([5, 5, 5, 5, 5]))).toBe(50);
     expect(scoreCategory("yahtzee", roll([5, 5, 5, 5, 2]))).toBe(0);
@@ -75,6 +77,30 @@ describe("totals and bonuses", () => {
     expect(lowerSectionTotal(scorecard)).toBe(207);
     expect(grandTotal(scorecard)).toBe(250);
   });
+
+  it("does not award upper bonus when under threshold", () => {
+    const scorecard: Record<string, number> = {
+      ones: 3,
+      twos: 6,
+      threes: 9,
+      fours: 12,
+      fives: 15,
+      sixes: 10, // totals 55
+    };
+    expect(upperSectionTotal(scorecard)).toBe(55);
+    expect(upperSectionBonus(scorecard)).toBe(0);
+  });
+
+  it("computes grand totals with partial cards", () => {
+    const partial = {
+      ones: 3,
+      twos: 6,
+      yahtzee: 50,
+    };
+    expect(upperSectionTotal(partial)).toBe(9);
+    expect(lowerSectionTotal(partial as any)).toBe(50);
+    expect(grandTotal(partial as any)).toBe(59);
+  });
 });
 
 describe("scorecard completeness", () => {
@@ -87,5 +113,10 @@ describe("scorecard completeness", () => {
     const fullCard = Object.fromEntries(allCategories.map((category) => [category, 1]));
     expect(upperSectionTotal(fullCard)).toBe(upperCategories.length);
     expect(scoreFilledCategories(fullCard)).toHaveLength(allCategories.length);
+  });
+
+  it("is incomplete when any category is missing", () => {
+    const partial = Object.fromEntries(allCategories.slice(0, -1).map((category) => [category, 2]));
+    expect(scoreFilledCategories(partial)).toHaveLength(allCategories.length - 1);
   });
 });
