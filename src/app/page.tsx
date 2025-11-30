@@ -144,6 +144,8 @@ export default function Home() {
   const playSelectSound = useChime(soundEnabled, { type: "select" });
   const playDiceSound = usePercussiveFx(soundEnabled, "dice");
   const playYahtzeeSound = usePercussiveFx(soundEnabled, "yahtzee");
+  const playWinFx = usePercussiveFx(soundEnabled, "celebrate");
+  const hasCelebratedWin = useRef(false);
 
   const currentPlayer = game.players[game.currentPlayerIndex];
   const currentProfile = playerProfiles[game.currentPlayerIndex] ?? playerProfiles[0];
@@ -365,6 +367,16 @@ const triggerRollAnimation = () => {
   const gameComplete = game.phase === "complete";
   const winner = gameComplete ? [...totals].sort((a, b) => b.total - a.total)[0]?.name : undefined;
 
+  useEffect(() => {
+    if (gameComplete && !hasCelebratedWin.current) {
+      hasCelebratedWin.current = true;
+      playWinFx();
+    }
+    if (!gameComplete) {
+      hasCelebratedWin.current = false;
+    }
+  }, [gameComplete, playWinFx]);
+
   const submitScores = useCallback(async () => {
     if (submitted || totals.length === 0) return;
     setSavingScores(true);
@@ -404,6 +416,10 @@ const triggerRollAnimation = () => {
             onContinue={handleAcknowledgeNextPlayer}
           />
         )}
+      </AnimatePresence>
+
+      <AnimatePresence initial={false}>
+        {gameComplete && winner && <WinnerCelebration winner={winner} />}
       </AnimatePresence>
 
       <AnimatePresence initial={false}>
@@ -1121,6 +1137,86 @@ function NextPlayerOverlay({
   );
 }
 
+export function WinnerCelebration({ winner }: { winner: string }) {
+  const bursts = [
+    { x: 18, y: 32, delay: 0, hue: 320 },
+    { x: 72, y: 26, delay: 0.15, hue: 200 },
+    { x: 50, y: 16, delay: 0.35, hue: 120 },
+    { x: 32, y: 64, delay: 0.05, hue: 45 },
+    { x: 76, y: 68, delay: 0.28, hue: 280 },
+  ];
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="pointer-events-none fixed inset-0 z-30 flex items-center justify-center bg-slate-900/70 backdrop-blur-md"
+    >
+      <div className="relative flex flex-col items-center gap-3 text-center">
+        <div className="pointer-events-auto rounded-3xl border border-white/15 bg-white/10 px-8 py-6 shadow-2xl shadow-indigo-900/50">
+          <p className="text-xs uppercase tracking-[0.35em] text-indigo-100/80">Game over</p>
+          <h2 className="mt-2 text-3xl font-bold text-white sm:text-4xl">{winner} wins!!!!</h2>
+          <p className="mt-1 text-sm text-indigo-100/80">Start a new round to keep the streak.</p>
+        </div>
+        <div className="pointer-events-none relative h-64 w-[360px] max-w-[80vw]">
+          {bursts.map((burst, idx) => (
+            <Firework
+              key={idx}
+              x={burst.x}
+              y={burst.y}
+              delay={burst.delay}
+              hue={burst.hue}
+              size={140}
+              data-testid="firework"
+            />
+          ))}
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+type FireworkProps = {
+  x: number;
+  y: number;
+  delay: number;
+  hue: number;
+  size: number;
+  "data-testid"?: string;
+};
+
+function Firework({ x, y, delay, hue, size, ...rest }: FireworkProps) {
+  return (
+    <motion.div
+      {...rest}
+      className="absolute rounded-full"
+      style={{
+        left: `${x}%`,
+        top: `${y}%`,
+        width: size,
+        height: size,
+        background: `radial-gradient(circle, hsla(${hue},95%,70%,0.9) 0%, hsla(${hue},90%,60%,0.6) 35%, hsla(${hue},85%,55%,0.2) 60%, transparent 70%)`,
+        boxShadow: `0 0 25px hsla(${hue},95%,65%,0.6)`,
+        transform: "translate(-50%, -50%)",
+      }}
+      initial={{ scale: 0.2, opacity: 0 }}
+      animate={{
+        scale: [0.2, 1, 1.2],
+        opacity: [0.8, 0.9, 0],
+        rotate: [0, 15, 0],
+      }}
+      transition={{
+        duration: 1.2,
+        delay,
+        repeat: Infinity,
+        repeatDelay: 1.5,
+        ease: "easeOut",
+      }}
+    />
+  );
+}
+
 function useChime(enabled: boolean, { type }: { type: "roll" | "select" }) {
   const ctxRef = useRef<AudioContext | null>(null);
 
@@ -1147,7 +1243,7 @@ function useChime(enabled: boolean, { type }: { type: "roll" | "select" }) {
   };
 }
 
-type PercussiveType = "dice" | "yahtzee";
+type PercussiveType = "dice" | "yahtzee" | "celebrate";
 
 function usePercussiveFx(enabled: boolean, type: PercussiveType) {
   const ctxRef = useRef<AudioContext | null>(null);
@@ -1162,8 +1258,10 @@ function usePercussiveFx(enabled: boolean, type: PercussiveType) {
       const now = ctx.currentTime;
       if (type === "dice") {
         playDiceClack(ctx, now);
-      } else {
+      } else if (type === "yahtzee") {
         playYahtzeeApplause(ctx, now);
+      } else {
+        playCelebrateChime(ctx, now);
       }
     } catch {
       /* ignore fx errors */
@@ -1223,4 +1321,19 @@ const playYahtzeeApplause = (ctx: AudioContext, start: number) => {
   bufferSource.connect(filter).connect(gain).connect(ctx.destination);
   bufferSource.start(start);
   bufferSource.stop(start + 1.5);
+};
+
+const playCelebrateChime = (ctx: AudioContext, start: number) => {
+  const notes = [523.25, 659.25, 783.99]; // C5, E5, G5
+  notes.forEach((freq, idx) => {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(freq, start + idx * 0.05);
+    gain.gain.setValueAtTime(0.18, start + idx * 0.05);
+    gain.gain.exponentialRampToValueAtTime(0.001, start + 0.4 + idx * 0.05);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(start + idx * 0.05);
+    osc.stop(start + 0.5 + idx * 0.05);
+  });
 };
