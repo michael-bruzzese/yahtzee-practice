@@ -171,4 +171,42 @@ describe("Home page UI flows", () => {
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
     expect(await screen.findByText("Net Winner")).toBeInTheDocument();
   });
+
+  it("saves player setup changes and updates header/turn", async () => {
+    setupFetch([{ ok: true, json: () => ({ scores: [] }) }]);
+
+    render(<Home />);
+    const nameInput = screen.getByLabelText("Player 1 name");
+    fireEvent.change(nameInput, { target: { value: "Alicia" } });
+    fireEvent.click(screen.getAllByRole("button", { name: "Save & start" })[0]);
+
+    await waitFor(() => expect(screen.queryByText("Set up your players")).not.toBeInTheDocument());
+    expect(screen.getByText(/Players: Alicia vs Player 2/)).toBeInTheDocument();
+    expect(screen.getByText(/Turn: Alicia/)).toBeInTheDocument();
+  });
+
+  it("toggles sound on and off", async () => {
+    setupFetch([{ ok: true, json: () => ({ scores: [] }) }]);
+    render(<Home />);
+    await closePlayerSetup();
+
+    const toggle = screen.getByRole("button", { name: /Sound on/i });
+    fireEvent.click(toggle);
+    expect(screen.getByRole("button", { name: /Sound off/i })).toBeInTheDocument();
+  });
+
+  it("scores a yahtzee and advances turn (covers applause fx path)", async () => {
+    vi.spyOn(Math, "random").mockReturnValue(0.99);
+    setupFetch([{ ok: true, json: () => ({ scores: [] }) }]);
+
+    render(<Home />);
+    await closePlayerSetup();
+
+    fireEvent.click(screen.getByRole("button", { name: "Roll Dice" }));
+    await waitFor(() => expect(screen.getAllByAltText(/Die showing/)).toHaveLength(5));
+    await waitFor(() => expect(screen.getByRole("button", { name: /Re-roll/i })).toBeEnabled());
+
+    fireEvent.click(screen.getByRole("button", { name: /Yahtzee/ }));
+    await waitFor(() => expect(screen.getByRole("button", { name: /Yahtzee/ })).toBeDisabled());
+  });
 });
