@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { bestAvailableScore, isSuboptimalChoice } from "@/app/page";
+import { bestAvailableScore, isSuboptimalChoice } from "@/app/suboptimal";
 import { createGame } from "./game";
 
 describe("suboptimal choice helpers", () => {

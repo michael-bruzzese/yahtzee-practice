@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { describe, expect, test } from "vitest";
-import { avatarOptions } from "@/app/page";
+import { avatarOptions } from "@/app/avatars";
 
 const publicDir = (...parts: string[]) => path.join(process.cwd(), "public", ...parts);
 

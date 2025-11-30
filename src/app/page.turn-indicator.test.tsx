@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import "@testing-library/jest-dom/vitest";
 import { render, screen } from "@testing-library/react";
-import { PlayerTotals } from "./page";
+import { PlayerTotals } from "./player-totals";
 
 describe("PlayerTotals turn indicator", () => {
   const totals = [

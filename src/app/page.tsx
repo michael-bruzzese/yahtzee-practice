@@ -3,96 +3,15 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  Category,
-  DiceRoll,
-  allCategories,
-  grandTotal,
-  scoreCategory,
-  upperCategories,
-} from "@/lib/yahtzee/rules";
+import { Category, DiceRoll, allCategories, grandTotal, scoreCategory, upperCategories } from "@/lib/yahtzee/rules";
 import { GameState, createGame, rollDice, selectCategory, toggleHold } from "@/lib/yahtzee/game";
 import { ScoreEntry } from "@/lib/leaderboard";
+import { AvatarOption, AvatarPose, avatarOptions, getAvatar } from "./avatars";
+import { bestAvailableScore, isSuboptimalChoice } from "./suboptimal";
+import { PlayerTotals } from "./player-totals";
+import { WinnerCelebration } from "./winner";
 
 type UIMessage = { type: "error" | "info"; text: string };
-
-type AvatarPose = "idle" | "windup" | "throw";
-
-export type AvatarOption = {
-  id: string;
-  label: string;
-  role: string;
-  frames: Record<AvatarPose, string>;
-};
-
-export const avatarOptions: AvatarOption[] = [
-  {
-    id: "ace",
-    label: "Ace Highroller",
-    role: "Lucky Gambler",
-    frames: {
-      idle: "/assets/avatars/ace-idle.svg",
-      windup: "/assets/avatars/ace-windup.svg",
-      throw: "/assets/avatars/ace-throw.svg",
-    },
-  },
-  {
-    id: "shadow",
-    label: "Shadow Sleuth",
-    role: "Midnight Detective",
-    frames: {
-      idle: "/assets/avatars/shadow-idle.svg",
-      windup: "/assets/avatars/shadow-windup.svg",
-      throw: "/assets/avatars/shadow-throw.svg",
-    },
-  },
-  {
-    id: "sunny",
-    label: "Sunny Spinner",
-    role: "Carnival Champ",
-    frames: {
-      idle: "/assets/avatars/sunny-idle.svg",
-      windup: "/assets/avatars/sunny-windup.svg",
-      throw: "/assets/avatars/sunny-throw.svg",
-    },
-  },
-  {
-    id: "nova",
-    label: "Nova Dicey",
-    role: "Cosmic Maverick",
-    frames: {
-      idle: "/assets/avatars/nova-idle.svg",
-      windup: "/assets/avatars/nova-windup.svg",
-      throw: "/assets/avatars/nova-throw.svg",
-    },
-  },
-];
-
-const getAvatar = (id: string) =>
-  avatarOptions.find((option) => option.id === id) ?? avatarOptions[0];
-
-export const bestAvailableScore = (game: GameState): { category: Category | null; score: number } => {
-  if (!game.dice) return { category: null, score: 0 };
-  const player = game.players[game.currentPlayerIndex];
-  const available = allCategories.filter((cat) => typeof player.scorecard[cat] !== "number");
-  let best: { category: Category | null; score: number } = { category: null, score: 0 };
-  available.forEach((category) => {
-    const score = scoreCategory(category, game.dice as DiceRoll);
-    if (score > best.score) {
-      best = { category, score };
-    }
-  });
-  return best;
-};
-
-export const isSuboptimalChoice = (game: GameState, category: Category): boolean => {
-  if (!game.dice) return false;
-  const player = game.players[game.currentPlayerIndex];
-  if (typeof player.scorecard[category] === "number") return false;
-  const chosen = scoreCategory(category, game.dice);
-  const best = bestAvailableScore(game);
-  return best.score > chosen;
-};
 
 type PlayerProfile = {
   name: string;
@@ -950,49 +869,6 @@ function Leaderboard({
   );
 }
 
-export function PlayerTotals({
-  totals,
-  currentIndex,
-}: {
-  totals: { name: string; total: number }[];
-  currentIndex: number;
-}) {
-  return (
-    <div className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm shadow-lg shadow-indigo-900/20">
-      <div className="mb-3 flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-white">Players</h3>
-        <p className="text-xs text-slate-200/80">tracking totals</p>
-      </div>
-      <div className="flex flex-col gap-2">
-        {totals.map((player, idx) => (
-          <div
-            key={player.name}
-            className={`flex items-center justify-between rounded-xl border px-3 py-2 text-sm transition ${
-              idx === currentIndex
-                ? "border-emerald-400/40 bg-emerald-500/15 text-emerald-50 shadow-[0_10px_40px_-20px_rgba(16,185,129,0.5)]"
-                : "border-white/10 bg-white/5 text-slate-100"
-            }`}
-          >
-            <div className="flex items-center gap-2">
-              <span className="inline-flex h-2.5 w-2.5 rounded-full bg-white/60" />
-              <span className="font-medium">{player.name}</span>
-              {idx === currentIndex && (
-                <span
-                  data-testid={`turn-indicator-${idx}`}
-                  className="rounded-full bg-emerald-400/20 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-emerald-50"
-                >
-                  Current turn
-                </span>
-              )}
-            </div>
-            <span className="text-base font-semibold">{player.total}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 function PlayerSetupModal({
   profiles,
   onChangeName,
@@ -1134,86 +1010,6 @@ function NextPlayerOverlay({
         </button>
       </motion.div>
     </motion.div>
-  );
-}
-
-export function WinnerCelebration({ winner }: { winner: string }) {
-  const bursts = [
-    { x: 18, y: 32, delay: 0, hue: 320 },
-    { x: 72, y: 26, delay: 0.15, hue: 200 },
-    { x: 50, y: 16, delay: 0.35, hue: 120 },
-    { x: 32, y: 64, delay: 0.05, hue: 45 },
-    { x: 76, y: 68, delay: 0.28, hue: 280 },
-  ];
-
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="pointer-events-none fixed inset-0 z-30 flex items-center justify-center bg-slate-900/70 backdrop-blur-md"
-    >
-      <div className="relative flex flex-col items-center gap-3 text-center">
-        <div className="pointer-events-auto rounded-3xl border border-white/15 bg-white/10 px-8 py-6 shadow-2xl shadow-indigo-900/50">
-          <p className="text-xs uppercase tracking-[0.35em] text-indigo-100/80">Game over</p>
-          <h2 className="mt-2 text-3xl font-bold text-white sm:text-4xl">{winner} wins!!!!</h2>
-          <p className="mt-1 text-sm text-indigo-100/80">Start a new round to keep the streak.</p>
-        </div>
-        <div className="pointer-events-none relative h-64 w-[360px] max-w-[80vw]">
-          {bursts.map((burst, idx) => (
-            <Firework
-              key={idx}
-              x={burst.x}
-              y={burst.y}
-              delay={burst.delay}
-              hue={burst.hue}
-              size={140}
-              data-testid="firework"
-            />
-          ))}
-        </div>
-      </div>
-    </motion.div>
-  );
-}
-
-type FireworkProps = {
-  x: number;
-  y: number;
-  delay: number;
-  hue: number;
-  size: number;
-  "data-testid"?: string;
-};
-
-function Firework({ x, y, delay, hue, size, ...rest }: FireworkProps) {
-  return (
-    <motion.div
-      {...rest}
-      className="absolute rounded-full"
-      style={{
-        left: `${x}%`,
-        top: `${y}%`,
-        width: size,
-        height: size,
-        background: `radial-gradient(circle, hsla(${hue},95%,70%,0.9) 0%, hsla(${hue},90%,60%,0.6) 35%, hsla(${hue},85%,55%,0.2) 60%, transparent 70%)`,
-        boxShadow: `0 0 25px hsla(${hue},95%,65%,0.6)`,
-        transform: "translate(-50%, -50%)",
-      }}
-      initial={{ scale: 0.2, opacity: 0 }}
-      animate={{
-        scale: [0.2, 1, 1.2],
-        opacity: [0.8, 0.9, 0],
-        rotate: [0, 15, 0],
-      }}
-      transition={{
-        duration: 1.2,
-        delay,
-        repeat: Infinity,
-        repeatDelay: 1.5,
-        ease: "easeOut",
-      }}
-    />
   );
 }
 

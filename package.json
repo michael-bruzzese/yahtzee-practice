@@ -4,14 +4,14 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build --webpack",
     "start": "next start",
     "start:e2e": "next start -p 3000",
     "lint": "eslint",
     "test": "vitest",
     "test:unit": "vitest run",
     "test:ci": "vitest run --coverage",
-    "pretest:e2e": "NEXT_PRIVATE_BUILD_WITH_TURBOPACK=0 TURBOPACK=0 next build",
+    "pretest:e2e": "next build --webpack",
     "test:e2e": "playwright test"
   },
   "dependencies": {
