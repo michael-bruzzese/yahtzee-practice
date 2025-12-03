@@ -3,7 +3,9 @@ import "@testing-library/jest-dom/vitest";
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import React, { useEffect } from "react";
 import { vi, describe, expect, it, beforeEach, afterEach } from "vitest";
-import Home, { NextPlayerOverlay, useChime, usePercussiveFx } from "./page";
+import Home from "./page";
+import { NextPlayerOverlay } from "./next-player-overlay";
+import { useChime, usePercussiveFx } from "./sound-hooks";
 
 vi.mock("framer-motion", () => {
   const ReactImport = require("react");
