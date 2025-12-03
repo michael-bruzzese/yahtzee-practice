@@ -58,6 +58,7 @@ export default function Home() {
   const [isRollingAnimation, setIsRollingAnimation] = useState(false);
   const [avatarPose, setAvatarPose] = useState<AvatarPose>("idle");
   const [savingScores, setSavingScores] = useState(false);
+  const [winnerDismissed, setWinnerDismissed] = useState(false);
   const animationTimers = useRef<ReturnType<typeof setTimeout>[]>([]);
   const playRollSound = useChime(soundEnabled, { type: "roll" });
   const playSelectSound = useChime(soundEnabled, { type: "select" });
@@ -280,6 +281,16 @@ const triggerRollAnimation = () => {
     setAvatarPose("idle");
   };
 
+  const handlePlayAgain = () => {
+    setRollKey((k) => k + 1);
+    setGame(createGame(playerProfiles.map((profile) => profile.name)));
+    setSubmitted(false);
+    setAwaitingNextPlayer(null);
+    setAvatarPose("idle");
+    setWinnerDismissed(false);
+    setMessage({ type: "info", text: "New round started" });
+  };
+
   const potentialScore = (category: Category) =>
     game.dice ? scoreCategory(category, game.dice) : null;
 
@@ -295,6 +306,12 @@ const triggerRollAnimation = () => {
       hasCelebratedWin.current = false;
     }
   }, [gameComplete, playWinFx]);
+
+  useEffect(() => {
+    if (gameComplete) {
+      setWinnerDismissed(false);
+    }
+  }, [gameComplete]);
 
   const submitScores = useCallback(async () => {
     if (submitted || totals.length === 0) return;
@@ -338,7 +355,9 @@ const triggerRollAnimation = () => {
       </AnimatePresence>
 
       <AnimatePresence initial={false}>
-        {gameComplete && winner && <WinnerCelebration winner={winner} />}
+        {gameComplete && winner && !winnerDismissed && (
+          <WinnerCelebration winner={winner} onPlayAgain={handlePlayAgain} onQuit={() => setWinnerDismissed(true)} />
+        )}
       </AnimatePresence>
 
       <AnimatePresence initial={false}>
@@ -1133,3 +1152,5 @@ const playCelebrateChime = (ctx: AudioContext, start: number) => {
     osc.stop(start + 0.5 + idx * 0.05);
   });
 };
+
+export { useChime, usePercussiveFx, NextPlayerOverlay };

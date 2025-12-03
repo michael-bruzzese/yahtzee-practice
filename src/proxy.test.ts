@@ -29,6 +29,11 @@ describe("proxy middleware", () => {
     expect(res.status).toBe(200);
   });
 
+  test("allows _next assets through without auth when password is set", () => {
+    const res = proxyFn(makeRequest({}, "/_next/static/chunk.js"));
+    expect(res.status).toBe(200);
+  });
+
   test("passes through when APP_PASSWORD is unset", async () => {
     process.env.APP_PASSWORD = "";
     vi.resetModules();

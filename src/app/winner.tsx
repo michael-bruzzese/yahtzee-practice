@@ -41,7 +41,15 @@ function Firework({ x, y, delay, hue, size, ...rest }: FireworkProps) {
   );
 }
 
-export function WinnerCelebration({ winner }: { winner: string }) {
+export function WinnerCelebration({
+  winner,
+  onPlayAgain,
+  onQuit,
+}: {
+  winner: string;
+  onPlayAgain: () => void;
+  onQuit: () => void;
+}) {
   const bursts = [
     { x: 18, y: 32, delay: 0, hue: 320 },
     { x: 72, y: 26, delay: 0.15, hue: 200 },
@@ -62,6 +70,22 @@ export function WinnerCelebration({ winner }: { winner: string }) {
           <p className="text-xs uppercase tracking-[0.35em] text-indigo-100/80">Game over</p>
           <h2 className="mt-2 text-3xl font-bold text-white sm:text-4xl">{winner} wins!!!!</h2>
           <p className="mt-1 text-sm text-indigo-100/80">Start a new round to keep the streak.</p>
+          <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:justify-center sm:gap-3">
+            <button
+              type="button"
+              onClick={onPlayAgain}
+              className="rounded-xl bg-white/90 px-4 py-2 text-sm font-semibold text-slate-900 shadow shadow-indigo-900/30 transition hover:bg-white"
+            >
+              Play again
+            </button>
+            <button
+              type="button"
+              onClick={onQuit}
+              className="rounded-xl border border-white/40 bg-white/10 px-4 py-2 text-sm font-semibold text-white/90 transition hover:border-white/60 hover:bg-white/20"
+            >
+              Quit
+            </button>
+          </div>
         </div>
         <div className="pointer-events-none relative h-64 w-[360px] max-w-[80vw]">
           {bursts.map((burst, idx) => (

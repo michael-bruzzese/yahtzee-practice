@@ -22,4 +22,16 @@ describe("suboptimal choice helpers", () => {
     // Any other low category should now be suboptimal.
     expect(isSuboptimalChoice(game, "ones")).toBe(true);
   });
+
+  test("returns false when no dice are rolled yet", () => {
+    const game = createGame(["Alice"]);
+    expect(isSuboptimalChoice(game, "ones")).toBe(false);
+  });
+
+  test("treats already-scored categories as non-suboptimal", () => {
+    const game = createGame(["Alice"]);
+    game.dice = [1, 2, 3, 4, 5];
+    game.players[0].scorecard.ones = 3;
+    expect(isSuboptimalChoice(game, "ones")).toBe(false);
+  });
 });

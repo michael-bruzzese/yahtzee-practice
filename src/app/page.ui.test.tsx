@@ -1,9 +1,9 @@
 // @vitest-environment jsdom
 import "@testing-library/jest-dom/vitest";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import React from "react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import React, { useEffect } from "react";
 import { vi, describe, expect, it, beforeEach, afterEach } from "vitest";
-import Home from "./page";
+import Home, { NextPlayerOverlay, useChime, usePercussiveFx } from "./page";
 
 vi.mock("framer-motion", () => {
   const ReactImport = require("react");
@@ -29,11 +29,11 @@ vi.mock("framer-motion", () => {
   };
 });
 
-const mockAudioContext = () => {
-  const destination = {};
-  const gainNode = () => ({
-    gain: {
-      setValueAtTime: vi.fn(),
+  const mockAudioContext = () => {
+    const destination = {};
+    const gainNode = () => ({
+      gain: {
+        setValueAtTime: vi.fn(),
       exponentialRampToValueAtTime: vi.fn(),
       linearRampToValueAtTime: vi.fn(),
       setTargetAtTime: vi.fn(),
@@ -44,6 +44,7 @@ const mockAudioContext = () => {
   const context = {
     currentTime: 0,
     destination,
+    sampleRate: 48000,
     createOscillator: () => ({
       frequency: {
         setValueAtTime: vi.fn(),
@@ -178,6 +179,7 @@ describe("Home page UI flows", () => {
     render(<Home />);
     const nameInput = screen.getByLabelText("Player 1 name");
     fireEvent.change(nameInput, { target: { value: "Alicia" } });
+    fireEvent.click(screen.getAllByRole("button", { name: /Shadow Sleuth/i })[0]);
     fireEvent.click(screen.getAllByRole("button", { name: "Save & start" })[0]);
 
     await waitFor(() => expect(screen.queryByText("Set up your players")).not.toBeInTheDocument());
@@ -208,5 +210,78 @@ describe("Home page UI flows", () => {
 
     fireEvent.click(screen.getByRole("button", { name: /Yahtzee/ }));
     await waitFor(() => expect(screen.getByRole("button", { name: /Yahtzee/ })).toBeDisabled());
+  });
+
+  it("advances turn after scoring and handles pass-to-player prompt when present", async () => {
+    vi.spyOn(Math, "random").mockReturnValue(0.99);
+    setupFetch([{ ok: true, json: () => ({ scores: [] }) }]);
+
+    render(<Home />);
+    await closePlayerSetup();
+
+    fireEvent.click(screen.getByRole("button", { name: "Roll Dice" }));
+    await waitFor(() => expect(screen.getByRole("button", { name: /Re-roll/i })).toBeEnabled());
+
+    fireEvent.click(screen.getByRole("button", { name: /Yahtzee/ }));
+    await waitFor(() => expect(screen.getByText(/Turn: Player 2/)).toBeInTheDocument());
+
+    const passButton = screen.queryByRole("button", { name: /Pass to Player 2/i });
+    if (passButton) {
+      fireEvent.click(passButton); // blocked by awaiting player
+      expect(await screen.findByText(/Pass play to Player 2/i)).toBeInTheDocument();
+    }
+  });
+
+  it("opens player setup from header and resets state with Reset/New game", async () => {
+    setupFetch([{ ok: true, json: () => ({ scores: [] }) }]);
+
+    render(<Home />);
+    await closePlayerSetup();
+
+    fireEvent.click(screen.getByRole("button", { name: "Roll Dice" }));
+    await waitFor(() => expect(screen.getAllByAltText(/Die showing/)).toHaveLength(5));
+
+    fireEvent.click(screen.getByRole("button", { name: "Reset" }));
+    expect(await screen.findByText(/New game started/i)).toBeInTheDocument();
+    expect(screen.getByText(/3 rolls left/i)).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "New game" }));
+    expect(await screen.findByText("Set up your players")).toBeInTheDocument();
+  });
+
+  it("runs sound hooks end-to-end without throwing", () => {
+    mockAudioContext();
+    const ready = vi.fn();
+
+    const Harness = ({ onReady }: { onReady: (value: Record<string, () => void>) => void }) => {
+      const playRoll = useChime(true, { type: "roll" });
+      const playSelect = useChime(true, { type: "select" });
+      const playDice = usePercussiveFx(true, "dice");
+      const playYahtzee = usePercussiveFx(true, "yahtzee");
+      const playCelebrate = usePercussiveFx(true, "celebrate");
+
+      useEffect(() => {
+        onReady({ playRoll, playSelect, playDice, playYahtzee, playCelebrate });
+      }, [onReady, playRoll, playSelect, playDice, playYahtzee, playCelebrate]);
+      return null;
+    };
+
+    render(<Harness onReady={ready} />);
+    return waitFor(() => {
+      expect(ready).toHaveBeenCalled();
+      const funcs = ready.mock.calls.at(-1)?.[0];
+      expect(funcs).toBeDefined();
+      act(() => {
+        Object.values(funcs as Record<string, () => void>).forEach((fn) => fn());
+      });
+    });
+  });
+
+  it("renders the next-player overlay component", () => {
+    const onContinue = vi.fn();
+    render(<NextPlayerOverlay nextPlayer="Tester" onContinue={onContinue} />);
+    expect(screen.getByText(/Pass the device/i)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Continue" }));
+    expect(onContinue).toHaveBeenCalled();
   });
 });
