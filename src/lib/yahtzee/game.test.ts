@@ -171,4 +171,14 @@ describe("error guards and completion", () => {
     expect(() => toggleHold(state, -1)).toThrow("dieIndex must be between 0 and 4");
     expect(() => toggleHold(state, 5)).toThrow("dieIndex must be between 0 and 4");
   });
+
+  it("prevents holding dice once the game is complete", () => {
+    const state = {
+      ...createGame(["Solo"]),
+      dice: [1, 1, 1, 1, 1] as DiceRoll,
+      held: [false, false, false, false, false],
+      phase: "complete" as const,
+    };
+    expect(() => toggleHold(state, 0)).toThrow("Game is complete");
+  });
 });

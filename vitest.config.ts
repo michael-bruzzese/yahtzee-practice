@@ -5,14 +5,16 @@ export default defineConfig({
   test: {
     globals: true,
     environment: "node",
-    include: ["src/**/*.test.ts"],
+    include: ["src/**/*.test.{ts,tsx}"],
     coverage: {
       provider: "v8",
       reporter: ["text", "lcov"],
-      statements: 70,
-      branches: 70,
-      lines: 70,
-      functions: 70,
+      thresholds: {
+        statements: 70,
+        branches: 70,
+        lines: 70,
+        functions: 70,
+      },
       exclude: ["e2e/**", "playwright.config.ts", "next-env.d.ts"],
     },
   },

@@ -3,96 +3,17 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  Category,
-  DiceRoll,
-  allCategories,
-  grandTotal,
-  scoreCategory,
-  upperCategories,
-} from "@/lib/yahtzee/rules";
+import { Category, DiceRoll, allCategories, grandTotal, scoreCategory, upperCategories } from "@/lib/yahtzee/rules";
 import { GameState, createGame, rollDice, selectCategory, toggleHold } from "@/lib/yahtzee/game";
 import { ScoreEntry } from "@/lib/leaderboard";
+import { AvatarOption, AvatarPose, avatarOptions, getAvatar } from "./avatars";
+import { bestAvailableScore, isSuboptimalChoice } from "./suboptimal";
+import { PlayerTotals } from "./player-totals";
+import { WinnerCelebration } from "./winner";
+import { NextPlayerOverlay } from "./next-player-overlay";
+import { useChime, usePercussiveFx } from "./sound-hooks";
 
 type UIMessage = { type: "error" | "info"; text: string };
-
-type AvatarPose = "idle" | "windup" | "throw";
-
-export type AvatarOption = {
-  id: string;
-  label: string;
-  role: string;
-  frames: Record<AvatarPose, string>;
-};
-
-export const avatarOptions: AvatarOption[] = [
-  {
-    id: "ace",
-    label: "Ace Highroller",
-    role: "Lucky Gambler",
-    frames: {
-      idle: "/assets/avatars/ace-idle.svg",
-      windup: "/assets/avatars/ace-windup.svg",
-      throw: "/assets/avatars/ace-throw.svg",
-    },
-  },
-  {
-    id: "shadow",
-    label: "Shadow Sleuth",
-    role: "Midnight Detective",
-    frames: {
-      idle: "/assets/avatars/shadow-idle.svg",
-      windup: "/assets/avatars/shadow-windup.svg",
-      throw: "/assets/avatars/shadow-throw.svg",
-    },
-  },
-  {
-    id: "sunny",
-    label: "Sunny Spinner",
-    role: "Carnival Champ",
-    frames: {
-      idle: "/assets/avatars/sunny-idle.svg",
-      windup: "/assets/avatars/sunny-windup.svg",
-      throw: "/assets/avatars/sunny-throw.svg",
-    },
-  },
-  {
-    id: "nova",
-    label: "Nova Dicey",
-    role: "Cosmic Maverick",
-    frames: {
-      idle: "/assets/avatars/nova-idle.svg",
-      windup: "/assets/avatars/nova-windup.svg",
-      throw: "/assets/avatars/nova-throw.svg",
-    },
-  },
-];
-
-const getAvatar = (id: string) =>
-  avatarOptions.find((option) => option.id === id) ?? avatarOptions[0];
-
-export const bestAvailableScore = (game: GameState): { category: Category | null; score: number } => {
-  if (!game.dice) return { category: null, score: 0 };
-  const player = game.players[game.currentPlayerIndex];
-  const available = allCategories.filter((cat) => typeof player.scorecard[cat] !== "number");
-  let best: { category: Category | null; score: number } = { category: null, score: 0 };
-  available.forEach((category) => {
-    const score = scoreCategory(category, game.dice as DiceRoll);
-    if (score > best.score) {
-      best = { category, score };
-    }
-  });
-  return best;
-};
-
-export const isSuboptimalChoice = (game: GameState, category: Category): boolean => {
-  if (!game.dice) return false;
-  const player = game.players[game.currentPlayerIndex];
-  if (typeof player.scorecard[category] === "number") return false;
-  const chosen = scoreCategory(category, game.dice);
-  const best = bestAvailableScore(game);
-  return best.score > chosen;
-};
 
 type PlayerProfile = {
   name: string;
@@ -139,11 +60,14 @@ export default function Home() {
   const [isRollingAnimation, setIsRollingAnimation] = useState(false);
   const [avatarPose, setAvatarPose] = useState<AvatarPose>("idle");
   const [savingScores, setSavingScores] = useState(false);
+  const [winnerDismissed, setWinnerDismissed] = useState(false);
   const animationTimers = useRef<ReturnType<typeof setTimeout>[]>([]);
   const playRollSound = useChime(soundEnabled, { type: "roll" });
   const playSelectSound = useChime(soundEnabled, { type: "select" });
   const playDiceSound = usePercussiveFx(soundEnabled, "dice");
   const playYahtzeeSound = usePercussiveFx(soundEnabled, "yahtzee");
+  const playWinFx = usePercussiveFx(soundEnabled, "celebrate");
+  const hasCelebratedWin = useRef(false);
 
   const currentPlayer = game.players[game.currentPlayerIndex];
   const currentProfile = playerProfiles[game.currentPlayerIndex] ?? playerProfiles[0];
@@ -359,11 +283,37 @@ const triggerRollAnimation = () => {
     setAvatarPose("idle");
   };
 
+  const handlePlayAgain = () => {
+    setRollKey((k) => k + 1);
+    setGame(createGame(playerProfiles.map((profile) => profile.name)));
+    setSubmitted(false);
+    setAwaitingNextPlayer(null);
+    setAvatarPose("idle");
+    setWinnerDismissed(false);
+    setMessage({ type: "info", text: "New round started" });
+  };
+
   const potentialScore = (category: Category) =>
     game.dice ? scoreCategory(category, game.dice) : null;
 
   const gameComplete = game.phase === "complete";
   const winner = gameComplete ? [...totals].sort((a, b) => b.total - a.total)[0]?.name : undefined;
+
+  useEffect(() => {
+    if (gameComplete && !hasCelebratedWin.current) {
+      hasCelebratedWin.current = true;
+      playWinFx();
+    }
+    if (!gameComplete) {
+      hasCelebratedWin.current = false;
+    }
+  }, [gameComplete, playWinFx]);
+
+  useEffect(() => {
+    if (gameComplete) {
+      setWinnerDismissed(false);
+    }
+  }, [gameComplete]);
 
   const submitScores = useCallback(async () => {
     if (submitted || totals.length === 0) return;
@@ -403,6 +353,12 @@ const triggerRollAnimation = () => {
             nextPlayer={awaitingNextPlayer}
             onContinue={handleAcknowledgeNextPlayer}
           />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence initial={false}>
+        {gameComplete && winner && !winnerDismissed && (
+          <WinnerCelebration winner={winner} onPlayAgain={handlePlayAgain} onQuit={() => setWinnerDismissed(true)} />
         )}
       </AnimatePresence>
 
@@ -934,49 +890,6 @@ function Leaderboard({
   );
 }
 
-export function PlayerTotals({
-  totals,
-  currentIndex,
-}: {
-  totals: { name: string; total: number }[];
-  currentIndex: number;
-}) {
-  return (
-    <div className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm shadow-lg shadow-indigo-900/20">
-      <div className="mb-3 flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-white">Players</h3>
-        <p className="text-xs text-slate-200/80">tracking totals</p>
-      </div>
-      <div className="flex flex-col gap-2">
-        {totals.map((player, idx) => (
-          <div
-            key={player.name}
-            className={`flex items-center justify-between rounded-xl border px-3 py-2 text-sm transition ${
-              idx === currentIndex
-                ? "border-emerald-400/40 bg-emerald-500/15 text-emerald-50 shadow-[0_10px_40px_-20px_rgba(16,185,129,0.5)]"
-                : "border-white/10 bg-white/5 text-slate-100"
-            }`}
-          >
-            <div className="flex items-center gap-2">
-              <span className="inline-flex h-2.5 w-2.5 rounded-full bg-white/60" />
-              <span className="font-medium">{player.name}</span>
-              {idx === currentIndex && (
-                <span
-                  data-testid={`turn-indicator-${idx}`}
-                  className="rounded-full bg-emerald-400/20 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-emerald-50"
-                >
-                  Current turn
-                </span>
-              )}
-            </div>
-            <span className="text-base font-semibold">{player.total}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 function PlayerSetupModal({
   profiles,
   onChangeName,
@@ -1081,146 +994,3 @@ function PlayerSetupModal({
     </div>
   );
 }
-
-function NextPlayerOverlay({
-  nextPlayer,
-  onContinue,
-}: {
-  nextPlayer: string;
-  onContinue: () => void;
-}) {
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 z-40 flex items-center justify-center bg-slate-950/90 px-4"
-    >
-      <motion.div
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.95, opacity: 0 }}
-        className="w-full max-w-sm rounded-3xl border border-white/10 bg-white/10 p-6 text-center text-white backdrop-blur-xl"
-      >
-        <p className="text-xs uppercase tracking-[0.4em] text-indigo-100/70">Pass the device</p>
-        <h2 className="mt-3 text-2xl font-semibold">
-          {nextPlayer}
-        </h2>
-        <p className="mt-2 text-sm text-indigo-100/80">
-          Hand off to the next player. Tap continue when they&apos;re ready.
-        </p>
-        <button
-          type="button"
-          onClick={onContinue}
-          className="mt-5 inline-flex w-full items-center justify-center rounded-2xl bg-white/90 px-4 py-2 text-sm font-semibold text-slate-900 shadow shadow-indigo-900/30 transition hover:bg-white"
-        >
-          Continue
-        </button>
-      </motion.div>
-    </motion.div>
-  );
-}
-
-function useChime(enabled: boolean, { type }: { type: "roll" | "select" }) {
-  const ctxRef = useRef<AudioContext | null>(null);
-
-  return () => {
-    if (!enabled || typeof window === "undefined") return;
-    try {
-      if (!ctxRef.current) {
-        ctxRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
-      }
-      const ctx = ctxRef.current;
-      const now = ctx.currentTime;
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = "sine";
-      osc.frequency.setValueAtTime(type === "roll" ? 420 : 660, now);
-      gain.gain.setValueAtTime(0.15, now);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.25);
-      osc.connect(gain).connect(ctx.destination);
-      osc.start(now);
-      osc.stop(now + 0.3);
-    } catch {
-      /* ignore sound errors */
-    }
-  };
-}
-
-type PercussiveType = "dice" | "yahtzee";
-
-function usePercussiveFx(enabled: boolean, type: PercussiveType) {
-  const ctxRef = useRef<AudioContext | null>(null);
-
-  return () => {
-    if (!enabled || typeof window === "undefined") return;
-    try {
-      if (!ctxRef.current) {
-        ctxRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
-      }
-      const ctx = ctxRef.current;
-      const now = ctx.currentTime;
-      if (type === "dice") {
-        playDiceClack(ctx, now);
-      } else {
-        playYahtzeeApplause(ctx, now);
-      }
-    } catch {
-      /* ignore fx errors */
-    }
-  };
-}
-
-const createNoiseBuffer = (ctx: AudioContext, duration = 0.3) => {
-  const buffer = ctx.createBuffer(1, Math.max(1, Math.floor(ctx.sampleRate * duration)), ctx.sampleRate);
-  const data = buffer.getChannelData(0);
-  for (let i = 0; i < data.length; i += 1) {
-    data[i] = (Math.random() * 2 - 1) * 0.6;
-  }
-  return buffer;
-};
-
-const playDiceClack = (ctx: AudioContext, start: number) => {
-  const bursts = 3;
-  for (let i = 0; i < bursts; i += 1) {
-    const delay = start + i * 0.08;
-    const bufferSource = ctx.createBufferSource();
-    bufferSource.buffer = createNoiseBuffer(ctx, 0.15);
-    const filter = ctx.createBiquadFilter();
-    filter.type = "bandpass";
-    filter.frequency.value = 1200 + Math.random() * 600;
-    filter.Q.value = 3;
-    const gain = ctx.createGain();
-    gain.gain.setValueAtTime(0.001, delay);
-    gain.gain.linearRampToValueAtTime(0.3, delay + 0.02);
-    gain.gain.exponentialRampToValueAtTime(0.001, delay + 0.18);
-    bufferSource.connect(filter).connect(gain).connect(ctx.destination);
-    bufferSource.start(delay);
-    bufferSource.stop(delay + 0.2);
-  }
-  const tone = ctx.createOscillator();
-  const toneGain = ctx.createGain();
-  tone.frequency.setValueAtTime(260, start);
-  tone.frequency.exponentialRampToValueAtTime(120, start + 0.25);
-  toneGain.gain.setValueAtTime(0.2, start);
-  toneGain.gain.exponentialRampToValueAtTime(0.001, start + 0.25);
-  tone.connect(toneGain).connect(ctx.destination);
-  tone.start(start);
-  tone.stop(start + 0.3);
-};
-
-const playYahtzeeApplause = (ctx: AudioContext, start: number) => {
-  const bufferSource = ctx.createBufferSource();
-  bufferSource.buffer = createNoiseBuffer(ctx, 1.5);
-  const filter = ctx.createBiquadFilter();
-  filter.type = "highpass";
-  filter.frequency.value = 600;
-  const gain = ctx.createGain();
-  gain.gain.setValueAtTime(0.001, start);
-  gain.gain.linearRampToValueAtTime(0.7, start + 0.15);
-  gain.gain.setTargetAtTime(0.2, start + 0.8, 0.4);
-  gain.gain.exponentialRampToValueAtTime(0.001, start + 1.5);
-  bufferSource.connect(filter).connect(gain).connect(ctx.destination);
-  bufferSource.start(start);
-  bufferSource.stop(start + 1.5);
-};

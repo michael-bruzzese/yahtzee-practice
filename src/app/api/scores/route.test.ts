@@ -47,6 +47,17 @@ describe("scores API route", () => {
     expect(data.scores[0].name).toBe("Tester");
   });
 
+  test("POST falls back to 0 score when non-numeric", async () => {
+    const res = await route.POST(
+      makeRequest({
+        players: [{ name: "Blank Score", score: "not-a-number" as any }],
+      })
+    );
+    expect(res.status).toBe(200);
+    const data = await res.json();
+    expect(data.scores[0].score).toBe(0);
+  });
+
   test("POST truncates players to 10, sanitizes names, drops negatives, and errors if all invalid", async () => {
     const players = Array.from({ length: 12 }, (_, i) => ({ name: ` Player ${i} `, score: i * 10 }));
     players[0].score = -10; // should drop
